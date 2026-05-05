@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: infrasight-api
+    runtime: docker
+    plan: free
+    rootDir: backend
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: REDIS_URL
+        value: redis://localhost:6379/0
+      - key: CORS_ORIGINS
+        sync: false
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "30"

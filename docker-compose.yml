@@ -1,0 +1,143 @@
+services:
+  # ─────────────────────────────────────────
+  # PostgreSQL with PostGIS
+  # ─────────────────────────────────────────
+  db:
+    image: postgis/postgis:16-3.4
+    platform: linux/amd64
+    container_name: infrasight_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-infrasight}
+      POSTGRES_USER: ${POSTGRES_USER:-infrasight_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-infrasight_pass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-infrasight_user} -d ${POSTGRES_DB:-infrasight}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────
+  # Redis (cache + celery broker)
+  # ─────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    platform: linux/amd64
+    container_name: infrasight_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────
+  # FastAPI Backend
+  # ─────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    container_name: infrasight_backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-infrasight_user}:INFRAPWD%40rajveer321@db:5432/${POSTGRES_DB:-infrasight}
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ─────────────────────────────────────────
+  # Celery Worker (ETL + scraper jobs)
+  # ─────────────────────────────────────────
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    container_name: infrasight_celery
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-infrasight_user}:INFRAPWD%40rajveer321@db:5432/${POSTGRES_DB:-infrasight}
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+    command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=4
+
+  # ─────────────────────────────────────────
+  # Celery Beat (cron scheduler)
+  # ─────────────────────────────────────────
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    container_name: infrasight_beat
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-infrasight_user}:INFRAPWD%40rajveer321@db:5432/${POSTGRES_DB:-infrasight}
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: celery -A app.workers.celery_app beat --loglevel=info
+
+  # ─────────────────────────────────────────
+  # Next.js Frontend
+  # ─────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    container_name: infrasight_frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_MAPBOX_TOKEN: ${MAPBOX_TOKEN:-}
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+
+volumes:
+  postgres_data:
+  redis_data:
+

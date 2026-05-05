@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+tests/
+test_*.py
+*.log
+celerybeat-schedule
+tenders_dump.html
+tenders_dump2.html
+captcha.png
+tendersodisha.png

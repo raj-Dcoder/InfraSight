@@ -1,0 +1,1158 @@
+<head>
+	<base target="_self">
+	<title>eProcurement System Government of Odisha</title>
+</head>
+<!-- BEGIN: HEADER -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<title>eProcurement System</title>
+<script type="text/javascript">djConfig = {"baseRelativePath":"/nicgep/app?service=asset&path=%2Fgep%2F","preventBackButtonFix":false,"parseWidgets":false} </script>
+
+<script type="text/javascript" src="/nicgep/app?service=asset&path=%2Fgep%2Fgep.js"></script><script type="text/javascript" src="/nicgep/app?service=asset&path=%2Fgep%2Fgep2.js"></script>
+<script type="text/javascript">
+dojo.registerModulePath("tapestry", "/nicgep/app?service=asset&path=%2Ftapestry%2F");
+</script>
+<script type="text/javascript" src="/nicgep/app?service=asset&path=%2Ftapestry%2Fcore.js"></script>
+<script type="text/javascript">
+dojo.require("tapestry.namespace");
+tapestry.requestEncoding='UTF-8';
+</script>
+<link rel="stylesheet" type="text/css" href="/nicgep/css/nicgep_web_style.css" />
+</head>
+<head>
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="no-cache">
+<meta http-equiv="Expires" content="-1">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<noscript>
+	<meta http-equiv="Refresh" content="2;url=https://tendersodisha.gov.in/nicgep/app?page=ErrorNotice&amp;service=page" id="Any"></meta> 
+</noscript>
+<link href="includes/dialog/dialog_box.css" rel="stylesheet" type="text/css">
+<link rel="shortcut icon" href="images/nation.ico" ></link>
+<link href="includes/dialog/nicgep_color_theme.css" rel="stylesheet" type="text/css">
+
+
+
+<!-- Javascript -->
+<script language="JavaScript" type="text/JavaScript" src="includes/evaluator.js"></script>
+<script language="javascript" src="includes/MessageDigest.js" ></script>
+<script language="JavaScript" type="text/JavaScript" src="includes/dialog/dialog_box.js"></script>
+<!-- End -->
+<script language="JavaScript" type="text/JavaScript">
+<!--
+	function MM_swapImgRestore() { //v3.0
+	  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+	}
+	
+	function MM_preloadImages() { //v3.0
+	  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+	    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+	    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+	}
+	
+	function MM_findObj(n, d) { //v4.01
+	  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+	    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+	  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+	  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+	  if(!x && d.getElementById) x=d.getElementById(n); return x;
+	}
+	
+	function MM_swapImage() { //v3.0
+	  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+	   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+	}
+//-->
+</script>
+
+</head>
+
+
+<body onLoad="MM_preloadImages('images/homeb.png','images/contactb.png','images/sitemapb.png')" onunload="" onpageshow="if (event.persisted) noBack();" ondragstart="return false;" id="Body">
+<script type="text/javascript" src="/nicgep/app?service=asset&amp;path=%2Forg%2Fapache%2Ftapestry%2Fform%2FDatePicker.js"></script>
+<script type="text/javascript"><!--
+var calendar_fromDate;
+var calendar_toDate;
+dojo.require("tapestry.event");
+// --></script>
+	
+	<script type="text/javascript">
+
+	if(navigator.appName == 'Microsoft Internet Explorer')
+	{
+	document.onkeydown = fnCheckKeysMIE;
+	}
+	else if(navigator.appName == 'Netscape')
+	{
+	document.onkeydown = fnCheckKeysNMF;
+	}
+	
+	function fnCheckKeysNMF(event)
+	{
+	
+	var e=event? event : window.event;
+	var event_element=e.target? e.target : e.srcElement;
+	
+	if (event.ctrlKey && (event.keyCode==78 || event.keyCode==84 || event.which==78 || event.which==84))
+	{
+	return false;
+	}
+	
+	if (event.altKey && (event.keyCode==37 || event.which==37))
+	{
+	return false;
+	}
+	
+	if (event.keyCode==8 && (event_element.tagName != 'INPUT' && event_element.tagName != 'TEXTAREA'))
+	{
+	return false;
+	}
+	
+	}
+	
+	function fnCheckKeysMIE()
+	{
+	
+	var e=event? event : window.event;
+	var event_element=e.target? e.target : e.srcElement;
+	
+	if (event.ctrlKey && (event.keyCode==78 || event.keyCode==84 || event.which==78 || event.which==84))
+	{
+	return false;
+	}
+	
+	if (event.altKey && (event.keyCode==37 || event.which==37))
+	{
+	return false;
+	}
+	
+	if (event.keyCode==8 && (event_element.tagName != 'INPUT' && event_element.tagName != 'TEXTAREA'))
+	{
+	return false;
+	}
+	
+	}
+
+	window.history.forward();
+	function noBack(){ window.history.forward(); }
+	
+	</script>
+		
+	<div id="content">
+		<table width="1004" height="100%" border="0" align="center" cellpadding="0" cellspacing="0" bgcolor="#FFFFFF">
+			<tr>
+				<td valign="top" height="40">
+					<table width="1000" border="0" align="center" cellspacing="0" cellpadding="0">
+    <tr> 
+    <td>
+		<table width="100%" height="22" border="0" cellpadding="0" cellspacing="0" id="Menu">
+		 <td width="210" height="22" align="right" class="date topBannerGradient"><a id="link1" name="link1" class="Menu" href="/nicgep/app?page=WebScreenReaderAccess&amp;service=page">Screen Reader Access</a>
+				
+		  </td>
+		</table>
+		</td>
+		</tr>
+   <tr> 
+    <td width="1005"><img border="0" width="1005" alt="Logo" src="images/topban.png" usemap="#Map" height="83" id="Any_0"></img></td>
+  </tr>		
+  <tr>
+    <td height="1" class="topBannerLine"></td>
+  </tr>
+
+  <tr> 
+    <td>
+		<table width="100%" height="22" border="0" cellpadding="0" cellspacing="0" id="Menu">
+        <tr> 
+          <td width="210" height="22" align="center" class="date primaryBg">
+				04-May-2026 
+		  </td>
+          <td align="center" class="secondaryBg">
+	           <span id="If">
+					<span id="For">
+						
+		             	 <span>
+							<a id="link1" name="link1" title="Search" class="Menu" href="/nicgep/app?page=FrontEndAdvancedSearch&amp;service=page" target="_self">Search</a>
+						</span>
+						<span class="divider1" id="Insert_2">|</span>
+					</span><span id="For_0">
+						
+		             	 <span>
+							<a id="link1" name="link1" title="Active Tenders" class="Menu" href="/nicgep/app?page=FrontEndLatestActiveTenders&amp;service=page" target="_self">Active Tenders</a>
+						</span>
+						<span class="divider1" id="Insert_2_0">|</span>
+					</span><span id="For_1">
+						
+		             	 <span>
+							<a id="link1" name="link1" title="Tenders by Closing Date" class="Menu" href="/nicgep/app?page=FrontEndListTendersbyDate&amp;service=page" target="_self">Tenders by Closing Date</a>
+						</span>
+						<span class="divider1" id="Insert_2_1">|</span>
+					</span><span id="For_2">
+						
+		             	 <span>
+							<a id="link1" name="link1" title="Corrigendum" class="Menu" href="/nicgep/app?page=FrontEndLatestActiveCorrigendums&amp;service=page" target="_self">Corrigendum</a>
+						</span>
+						<span class="divider1" id="Insert_2_2">|</span>
+					</span><span id="For_3">
+						
+		             	 <span>
+							<a id="link1" name="link1" title="Results of Tenders" class="Menu" href="/nicgep/app?page=ResultOfTenders&amp;service=page" target="_self">Results of Tenders</a>
+						</span>
+						
+					</span>
+	          </span>
+	          
+          </td>
+          <td width="215" valign="middle" class="primaryBg">
+			<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
+              <tr> 
+                <td width="28%"><div align="center"><a id="homeLink" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image4','','images/homeb.png',1)" page="Home" href="/nicgep/app?service=restart"><img src="images/homea.png" alt="Home" name="Image4" width="47" height="18" border="0"></a></div></td>
+                <td width="40%"><div align="center"><a id="PageLink_6" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image5','','images/contactb.png',1)" href="/nicgep/app?page=FrontEndContactUs&amp;service=page"><img src="images/contacta.png" alt="Contact Us" name="Image5" width="78" height="18" border="0"></a></div></td>
+                <td width="32%"><div align="center"><a id="PageLink_7" onMouseOut="MM_swapImgRestore()" onMouseOver="MM_swapImage('Image6','','images/sitemapb.png',1)" href="/nicgep/app?page=SiteMap&amp;service=page"><img src="images/sitemapa.png" alt="Sitemap" name="Image6" width="63" height="18" border="0"></a></div></td>                 
+              </tr>
+            </table></td>
+        </tr>
+      </table></td>
+  </tr>
+  <tr>
+	<td>
+		<table width="100%" cellspacing="0" cellpadding="0">
+	<tr>
+		<td class="notice" width="20" align="right"><img src="images/notice.png" width="15" height="16" alt="Notices" /> </td>
+		<td class="notice_strip">
+			<marquee align="left" id="gepNotice" onMouseover="this.stop();" onMouseout="this.start();" scrolldelay="200">
+				<span id="If_1">
+    				
+
+<table border="0" cellspacing="2" id="noticeView" wordwrap="false" cellpadding="0">
+	
+    					<tr>
+    						
+
+
+	<td style="padding-right:20px;" id="informal">
+		<a id="PageLink" class="notice_link" href="/nicgep/app?page=WebAnnouncements&amp;service=page#230">&laquo; For any issues or clarifications relating to the Online Payment, Please contact ICICI BANK Help Desk No. 7205000695 during office hours 10.00 AM to 5.00 PM. E-Mail - kajal.singh6@icicibank.com and rani.biswal@icicibank.com</a>
+	</td>
+
+	<td style="padding-right:20px;" id="informal_0">
+		<a id="PageLink_0" class="notice_link" href="/nicgep/app?page=WebAnnouncements&amp;service=page#224">&laquo; For any issues regarding Bidder validation, Please contact Help Desk No. 0674-2530998 during office hours 10.00 AM to 5.00 PM.</a>
+	</td>
+
+
+
+    					</tr>
+    				
+</table>
+
+
+				</span>
+				
+			</marquee>
+		</td>
+	</tr>
+</table>
+	</td>
+  </tr>
+</table>
+<map name="Map">
+  <a id="PageLink_8" shape="circle" coords="43,43,37" href="/nicgep/app?page=Home&amp;service=page"></a>
+</map>
+
+				</td>
+			</tr>
+			<tr>
+				<td valign="top">
+					<table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0">
+						<tr>
+
+							<td width="214" class="navigation"><script language="javascript">
+
+	// Script to view document in popup
+	function popup(mylink, windowname)
+	{
+		if (! window.focus)return true;
+		var href;
+		if (typeof(mylink) == 'string')
+	 		href=mylink;
+		else
+			href=mylink.href;
+			window.open(href, "Popup", 'location=no, scrollbars=yes, toolbar=no, width=700, height=550, directories=no, menubar=no, resizable=yes, status=no, titlebar=yes');
+			return false;   
+	}
+
+</script>
+
+<table width="100%" height="100%" cellspacing="0" cellpadding="0" class="left_nav">	
+	
+	<tr> 
+         <td height="10"></td>
+     </tr>
+     	
+	<tr>
+		<td valign="top">
+			<table width="214" border="0" cellspacing="0" cellpadding="0">
+				<span id="If_2">
+					<tr id="For_5">
+						<span id="If_0_4">
+							<span id="If_3">
+			             		<tr> 
+					             	<td height="37" background="images/textbg.png" align="center"><a id="GenericLink" rel="noopener noreferrer" title="Reports" class="link1" href="https://gepnicreports.gov.in/eprocreports/ori/" target="_blank">MIS Reports</a></td>
+					             </tr>
+			             	 </span>
+			             	 
+			             	 
+			             	 <tr> 
+				                <td height="10"></td>
+				             </tr>
+			             	 
+						</span>
+					</tr><tr id="For_6">
+						<span id="If_0_5">
+							
+			             	 <span>
+				             	 <tr> 
+				                	<td height="37" background="images/textbg.png" align="center"><a id="PageLink_1" title="Tenders by Location" class="link1" href="/nicgep/app?page=FrontEndTendersByLocation&amp;service=page" target="_self">Tenders by Location</a></td>
+				             	 </tr>
+			             	 </span>
+			             	 
+			             	 <tr> 
+				                <td height="10"></td>
+				             </tr>
+			             	 
+						</span>
+					</tr><tr id="For_7">
+						<span id="If_0_6">
+							
+			             	 <span>
+				             	 <tr> 
+				                	<td height="37" background="images/textbg.png" align="center"><a id="PageLink_2" title="Tenders by Organisation" class="link1" href="/nicgep/app?page=FrontEndTendersByOrganisation&amp;service=page" target="_self">Tenders by Organisation</a></td>
+				             	 </tr>
+			             	 </span>
+			             	 
+			             	 <tr> 
+				                <td height="10"></td>
+				             </tr>
+			             	 
+						</span>
+					</tr><tr id="For_8">
+						<span id="If_0_7">
+							
+			             	 <span>
+				             	 <tr> 
+				                	<td height="37" background="images/textbg.png" align="center"><a id="PageLink_3" title="Tenders by Classification" class="link1" href="/nicgep/app?page=FrontEndTendersByClassification&amp;service=page" target="_self">Tenders by Classification</a></td>
+				             	 </tr>
+			             	 </span>
+			             	 
+			             	 <tr> 
+				                <td height="10"></td>
+				             </tr>
+			             	 
+						</span>
+					</tr><tr id="For_9">
+						<span id="If_0_8">
+							
+			             	 <span>
+				             	 <tr> 
+				                	<td height="37" background="images/textbg.png" align="center"><a id="PageLink_4" title="Tenders in Archive" class="link1" href="/nicgep/app?page=FrontEndTendersInArchive&amp;service=page" target="_self">Tenders in Archive</a></td>
+				             	 </tr>
+			             	 </span>
+			             	 
+			             	 <tr> 
+				                <td height="10"></td>
+				             </tr>
+			             	 
+						</span>
+					</tr><tr id="For_10">
+						<span id="If_0_9">
+							
+			             	 <span>
+				             	 <tr> 
+				                	<td height="37" background="images/textbg.png" align="center"><a id="PageLink_5" title="Tenders Status" class="link1" href="/nicgep/app?page=WebTenderStatusLists&amp;service=page" target="_self">Tenders Status</a></td>
+				             	 </tr>
+			             	 </span>
+			             	 
+			             	 <tr> 
+				                <td height="10"></td>
+				             </tr>
+			             	 
+						</span>
+					</tr><tr id="For_11">
+						<span id="If_0_10">
+							
+			             	 <span>
+				             	 <tr> 
+				                	<td height="37" background="images/textbg.png" align="center"><a id="PageLink_9" title="Cancelled Tenders" class="link1" href="/nicgep/app?page=WebCancelledTenderLists&amp;service=page" target="_self">Cancelled/Retendered</a></td>
+				             	 </tr>
+			             	 </span>
+			             	 
+			             	 <tr> 
+				                <td height="10"></td>
+				             </tr>
+			             	 
+						</span>
+					</tr><tr id="For_12">
+						<span id="If_0_11">
+							
+			             	 <span>
+				             	 <tr> 
+				                	<td height="37" background="images/textbg.png" align="center"><a id="PageLink_10" title="Downloads" class="link1" href="/nicgep/app?page=StandardBiddingDocuments&amp;service=page" target="_self">Downloads</a></td>
+				             	 </tr>
+			             	 </span>
+			             	 
+			             	 <tr> 
+				                <td height="10"></td>
+				             </tr>
+			             	 
+						</span>
+					</tr><tr id="For_13">
+						<span id="If_0_12">
+							
+			             	 <span>
+				             	 <tr> 
+				                	<td height="37" background="images/textbg.png" align="center"><a id="PageLink_11" title="Announcements" class="link1" href="/nicgep/app?page=WebAnnouncements&amp;service=page" target="_self">Announcements</a></td>
+				             	 </tr>
+			             	 </span>
+			             	 
+			             	 <tr> 
+				                <td height="10"></td>
+				             </tr>
+			             	 
+						</span>
+					</tr><tr id="For_14">
+						<span id="If_0_13">
+							
+			             	 <span>
+				             	 <tr> 
+				                	<td height="37" background="images/textbg.png" align="center"><a id="PageLink_12" title="D" class="link1" href="/nicgep/app?page=FrontEndDebarmentList&amp;service=page" target="_self">Debarment List</a></td>
+				             	 </tr>
+			             	 </span>
+			             	 
+			             	 <tr> 
+				                <td height="10"></td>
+				             </tr>
+			             	 
+						</span>
+					</tr><tr id="For_15">
+						<span id="If_0_14">
+							
+			             	 <span>
+				             	 <tr> 
+				                	<td height="37" background="images/textbg.png" align="center"><a id="PageLink_13" title="Awards" class="link1" href="/nicgep/app?page=WebAwards&amp;service=page" target="_self">Recognitions</a></td>
+				             	 </tr>
+			             	 </span>
+			             	 
+			             	 <tr> 
+				                <td height="10"></td>
+				             </tr>
+			             	 
+						</span>
+					</tr><tr id="For_16">
+						<span id="If_0_15">
+							
+			             	 <span>
+				             	 <tr> 
+				                	<td height="37" background="images/textbg.png" align="center"><a id="PageLink_14" title="Site compatibility" class="link1" href="/nicgep/app?page=SiteComp&amp;service=page" target="_self">Site compatibility</a></td>
+				             	 </tr>
+			             	 </span>
+			             	 
+			             	 <tr> 
+				                <td height="10"></td>
+				             </tr>
+			             	 
+						</span>
+					</tr><tr id="For_17">
+						
+					</tr><tr id="For_18">
+						
+					</tr><tr id="For_19">
+						
+					</tr><tr id="For_20">
+						
+					</tr><tr id="For_21">
+						
+					</tr>
+					
+					<tr> 
+		                <td height="10"></td>
+		             </tr>
+				</span>
+				
+				<span id="If_15">
+					<tr> 
+	               		<td height="30" align="center">
+							<table width="160" height="114" border="0" align="center" cellpadding="0" cellspacing="0">
+								<tr id="For_23"> 
+				             		<tr>
+				             			<td height="15" valign="top"><a id="GenericLink_0" rel="noopener noreferrer" title="DashBoard" href="https://eprocure.gov.in/eprocdashboard?siteCode=ODI" target="_blank"><img border="0" width="160" src="images/dashboard.png" height="34" id="Any_1"></img></a></td>
+				             		</tr>
+				             		 <tr> 
+						                <td height="10"></td>
+						             </tr>
+				             	 </tr><tr id="For_24"> 
+				             		<tr>
+				             			<td height="15" valign="top"><a id="GenericLink_0_0" rel="noopener noreferrer" title="link" href="https://gepnic.gov.in" target="_blank"><img border="0" width="160" src="images/Gepnic Logo.png" height="34" id="Any_2"></img></a></td>
+				             		</tr>
+				             		 <tr> 
+						                <td height="10"></td>
+						             </tr>
+				             	 </tr><tr id="For_25"> 
+				             		<tr>
+				             			<td height="15" valign="top"><a id="GenericLink_0_1" rel="noopener noreferrer" title="National Portal of India - External Link that open in a new window" href="http://india.gov.in" target="_blank"><img border="0" width="160" src="images/indiagovin.png" height="34" id="Any_3"></img></a></td>
+				             		</tr>
+				             		 <tr> 
+						                <td height="10"></td>
+						             </tr>
+				             	 </tr><tr id="For_26"> 
+				             		<tr>
+				             			<td height="15" valign="top"><a id="GenericLink_0_2" rel="noopener noreferrer" title="Odisha" href="http://www.odisha.gov.in/" target="_blank"><img border="0" width="160" src="images/tngovin.png" height="34" id="Any_4"></img></a></td>
+				             		</tr>
+				             		 <tr> 
+						                <td height="10"></td>
+						             </tr>
+				             	 </tr><tr id="For_27"> 
+				             		<tr>
+				             			<td height="15" valign="top"><a id="GenericLink_0_3" rel="noopener noreferrer" title="CPPP  on eProcurement - External link that opens in a new window" href="http://eprocure.gov.in/cppp" target="_blank"><img border="0" width="160" src="images/tendersindiammp.png" height="34" id="Any_5"></img></a></td>
+				             		</tr>
+				             		 <tr> 
+						                <td height="10"></td>
+						             </tr>
+				             	 </tr>
+							</table>
+				 		</td>
+	             	</tr>					
+				</span>	
+				
+				<tr> 
+					<td height="30" align="center">&nbsp;</td>
+			  	</tr>							
+			  	
+			</table>
+		</td>
+	</tr>
+	
+</table></td>
+							<td class="page_content" valign="top">
+							<!-- Page content starts here -->
+								
+
+	
+<form method="post" action="/nicgep/app" id="TenderAdvancedSearch">
+<div style="display:none;" id="TenderAdvancedSearchhidden"><input type="hidden" name="formids" value="tokenSecret,If_17,TenderType,tenderId,If_0_22,If_19,OrganisationName,tenderRefNo,If_21,Department,workItemTitle,If_23,Division,tenderCategory,If_25,SubDivision,ProductCategory,If_27,formContract,If_29,pinCode,PaymentMode,valueCriteria,valueParameter,FromValue,ToValue,dateCriteria,fromDate,toDate,twoStageAllowed,ndaAllowed,prefBidAllowed,chkGteAllowed,chkIteAllowed,chkTfeAllowed,chkEfeAllowed,captchaText,captcha,submit" />
+<input type="hidden" name="seedids" value="ZH4sIAAAAAAAAAE2PTU7DMBCF0wU3maUXcdSmZdlItKpUEKIVLCOTTIhFMrZs06isEOfhatyByU9FN/b3POM3b35+o5vPKJp9z76ER3fSBUIsrHrrr8K01hBSGJiC0oSO2aP32lBPlo8XfM2MK4fSjtglgFyKQ41Nwy9rOkMqMlOex9ajsZmi0ajR9C5hIXYVyFRsjIPklkUeQyLFXeMR5GqyzCXML5gw1qbFPX9nl0dO22OeXovlOO7BhHEnGuBZYwdSOCTOO4SSU+XJdNylAzomD4nQVBnXqoY7OqesxZLpYg9y8T9qNY7aYxXukT5YbZEX1MUU8ErxanNxHKavy5OiAssDKlfUEP8BILU5aosBAAA=" />
+<input type="hidden" name="component" value="TenderAdvancedSearch" />
+<input type="hidden" name="page" value="FrontEndAdvancedSearch" />
+<input type="hidden" name="service" value="direct" />
+<input type="hidden" name="session" value="T" />
+<input type="hidden" name="submitmode" value="" />
+<input type="hidden" name="submitname" value="" />
+<input type="hidden" name="tokenSecret" id="tokenSecret" value="SRta82bzi6LaeqlKr+MlQl1Q2YupytG/ChQd/zElM+ibkiYHvzDrgUfmgLCN/CPrO" />
+<input type="hidden" name="If_17" value="F" />
+<input type="hidden" name="If_0_22" value="F" />
+<input type="hidden" name="If_19" value="T" />
+<input type="hidden" name="If_21" value="T" />
+<input type="hidden" name="If_23" value="T" />
+<input type="hidden" name="If_25" value="T" />
+<input type="hidden" name="If_27" value="F" />
+<input type="hidden" name="If_29" value="F" />
+</div>
+  	
+	<table width="100%" height="100%" border="0" align="center" cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" height="100%">
+				<!-- Page Content -->
+				<!-- Content Area -->
+				<table width="100%" cellspacing="0" cellpadding="0" border="0" height="100%">
+					<tr>
+						<td class="page_content" height="100%" valign="top">
+							<table width="100%" cellspacing="0" cellpadding="0" border="0">
+								
+								<tr>
+									<td>
+										<!-- interface_elements -->
+										<table width="92%" border="0" align="center" cellpadding="0" cellspacing="0">
+											<tr>
+												<td>&nbsp;</td>
+											</tr>
+											<tr>
+												<td valign="left">
+													<table width="100%" cellpadding="0" cellspacing="0">
+														<tr>
+															<td valign="bottom" class="pageheader" align="left">Advanced Tender Search</td>
+															<td align="right" width="80"><a id="PageLink_15" title="Back" class="customButton_link" value="Back" href="/nicgep/app?page=Home&amp;service=page">Back</a></td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+											<tr>																									
+												<td>&nbsp;</td>
+											</tr>
+											<tr>
+												<td>&nbsp;</td>
+											</tr>
+											
+											
+											<tr>
+												<td>														
+													<table width="100%" cellspacing="0" cellpadding="0">
+														<tr>
+															<td>
+																<table width="100%" cellspacing="0" cellpadding="0" class="list_table">
+																	
+																	<TR>
+																		<td class="td_caption" width="15%" align="left">Tender Type <span class="mandatory">*</span></td>
+																		<td class="td_element" width="35%">
+																			<select name="TenderType" id="TenderType" style="width:200px;">
+<option value="0">-Select-</option>
+<option value="1">Open Tender</option>
+<option value="2">Limited Tender</option>
+</select>
+																		</td>
+																		<td class="td_caption" width="15%" align="left">Tender ID </td>
+																		<td class="td_element" width="35%">
+																			<input type="text" name="tenderId" value="" id="tenderId" style="width:200px;" autocomplete="off" maxlength="30" />
+																		</td>	
+																	</TR>
+																	
+																																								
+																	
+																	<TR>
+																		<span id="If_19">
+																			<TD class="td_caption" width="15%" align="left">Organisation</TD>
+																			<TD class="td_element" width="35%">
+																				<select name="OrganisationName" id="OrganisationName" style="width:200px;">
+<option value="0">-Select-</option>
+<option value="1">Bhubaneswar Development Authority</option>
+<option value="2">Bhubaneswar Smart City Limited</option>
+<option value="3">Capital Region Urban Transport</option>
+<option value="4">CCE Brutang and Hadua Irrigation Project Dasapalla</option>
+<option value="5">CCE Deo Irr Project Karanjia</option>
+<option value="6">CCE, L Suktel Irr.Project,Bolangir</option>
+<option value="7">CCE Potteru Irr.Project,Balimela</option>
+<option value="8">CCE Upper Indravati Irrigation Project Mukhiguda</option>
+<option value="9">CE and BM Brahmani Basin Samal</option>
+<option value="10">CE AND BM MBBS CHANDIKOLE</option>
+<option value="11">CE BM Baitarani Basin Kenojhar</option>
+<option value="12">CE-BM,LMB Basin,BBSR</option>
+<option value="13">CE-BM,RVN Basin,Berhampur</option>
+<option value="14">CE-BM, Tel Basin,Bhawanipatna</option>
+<option value="15">CE-BM,UM Basin,Burla</option>
+<option value="16">CE,Drainage,Cuttack</option>
+<option value="17">CE,Minor Irrigation,BBSR</option>
+<option value="18">CE-NH</option>
+<option value="19">CE RW I</option>
+<option value="20">Chief Engineer Mech - WR Bhubaneswar</option>
+<option value="21">Commerce and Transport (Transport) Department</option>
+<option value="22">DG Odisha Police Cuttack</option>
+<option value="23">Directorate of Agriculture and Food Production</option>
+<option value="24">Directorate of Technical Education and Training</option>
+<option value="25">EIC-CIVIL</option>
+<option value="26">IDCO</option>
+<option value="27">Municipal Bodies</option>
+<option value="28">Odisha Agro Industries Corporation Ltd.</option>
+<option value="29">Odisha Coal and Power Limited</option>
+<option value="30">ODISHA CONSTRUCTION CORPORATION LTD</option>
+<option value="31">Odisha Cooperative Tasar and Silk Federation LTD</option>
+<option value="32">Odisha Hydro Power Corporation Ltd</option>
+<option value="33">Odisha Power Generation Corporation Limited</option>
+<option value="34">Odisha Small Industries Corporation Ltd</option>
+<option value="35">Odisha State Agricultural Marketing Board</option>
+<option value="36">Odisha State Civil Supplies Corp. Ltd.</option>
+<option value="37">Odisha State Co. Milk Producers Federation Ltd.</option>
+<option value="38">Odisha State Medical Corporation Ltd</option>
+<option value="39">Odisha State Seed Corporation Ltd</option>
+<option value="40">Odisha Tourism Devl. Corp.</option>
+<option value="41">OPEPA Bhubaneswar</option>
+<option value="42">Orissa Bridge and  Construction Corporation Ltd</option>
+<option value="43">Orissa Lift Irrigation Corporation</option>
+<option value="44">Orissa Mining Corporation</option>
+<option value="45">Orissa Power Transmission Corporation Ltd</option>
+<option value="46">Orissa State Road Transport Corporation</option>
+<option value="47">Orissa Water Supply and Sewerage Board</option>
+<option value="48">Panchayati Raj and Drinking Water Department Odisha</option>
+<option value="49">PURI KONARK DEVELOPMENT AUTHORITY</option>
+<option value="50">Rourkela Develpoment Authority</option>
+<option value="51">Rourkela Municipal Corporation</option>
+<option value="52">Rural Water Supply and Sanitation</option>
+<option value="53">ST and  SC Development Deptt</option>
+<option value="54">WATCO Bhubaneswar</option>
+</select>
+																			</TD>
+																		</span>
+																		<td class="td_caption" align="left" width="15%">Tender Reference Number</td>
+																		<td class="td_element" width="35%">
+																			<input type="text" name="tenderRefNo" value="" id="tenderRefNo" style="width:200px;" maxlength="100" autocomplete="off" />
+																		</td>																																							
+																	</TR>
+																	
+																	<TR>
+																		<span id="If_21">
+																			<TD class="td_caption" width="15%" align="left">Department</TD>
+																			<TD class="td_element" width="35%" >
+																				<select name="Department" id="Department" style="width:200px;">
+<option value="0">-Select-</option>
+</select>
+																			</TD>
+																		</span>
+																		<TD class="td_caption" width="15%" align="left">Work/Item Title</TD>
+																		<TD class="td_element" width="35%">
+																			<input type="text" name="workItemTitle" value="" id="workItemTitle" style="width:200px;" maxlength="250" autocomplete="off" />
+																		</TD>																				
+																	</TR>															
+																	
+																	<TR>
+																		<span id="If_23">
+																			<TD class="td_caption" width="15%" align="left">Division</TD>
+																			<TD class="td_element" width="35%" >
+																				<select name="Division" id="Division" style="width:200px;">
+<option value="0">-Select-</option>
+</select>
+																			</TD>
+																		</span>	
+																		<TD class="td_caption" width="15%" align="left">Tender Category</TD>
+																		<TD class="td_element" width="35%">
+										 									  <select name="tenderCategory" id="tenderCategory" style="width:200px;">
+<option value="0">-Select-</option>
+<option value="1">Goods</option>
+<option value="2">Services</option>
+<option value="3">Works</option>
+</select>
+																		</TD>
+																	</TR>																			
+																	
+																	<TR>
+																		<span id="If_25">
+																			<TD class="td_caption" width="15%" align="left">Sub Division</TD>
+																			<TD class="td_element" width="35%">
+																				<select name="SubDivision" id="SubDivision" style="width:200px;">
+<option value="0">-Select-</option>
+</select>
+																			</TD>
+																		</span>
+																		<TD class="td_caption" width="15%" align="left">Product Category</TD>
+																		<TD class="td_element" width="35%">
+																			<select name="ProductCategory" id="ProductCategory" style="width:200px;">
+<option value="0">-Select-</option>
+<option value="1">Civil Works - Bridges</option>
+<option value="2">Civil Works - Buildings</option>
+<option value="3">Civil Works - Canal</option>
+<option value="4">Civil Works - Lift Irrigation Schemes</option>
+<option value="5">Civil Works - Others</option>
+<option value="6">Civil Works - Roads</option>
+<option value="7">Civil Works - Water Works</option>
+<option value="8">Consultancy Services</option>
+<option value="9">Electrical Works</option>
+<option value="10">Handling and Transportation</option>
+<option value="11">Human Resources Supply</option>
+<option value="12">Laboratory Equipment</option>
+<option value="13">Mechanical Works</option>
+<option value="14">Medicines</option>
+<option value="15">Miscellaneous Goods</option>
+<option value="16">Miscellaneous Services</option>
+<option value="17">Miscellaneous Works</option>
+<option value="18">Stationery</option>
+</select>
+																		</TD>
+																	</TR>																		
+																	
+																	<TR>
+																		
+																		<TD class="td_caption" width="15%" align="left">Form of Contract</TD>
+																		<TD class="td_element" width="35%">
+										 									  <select name="formContract" id="formContract" style="width:200px;">
+<option value="0">-Select-</option>
+<option value="1">Empanelment</option>
+<option value="2">EOI</option>
+<option value="3">Item Rate</option>
+<option value="4">Item Wise</option>
+<option value="5">Lump-sum</option>
+<option value="6">Percentage</option>
+<option value="7">Tender cum Auction</option>
+<option value="8">Turn-key</option>
+</select>
+																		</TD>
+																	</TR>
+																	
+																	<TR>
+																				
+																		<TD class="td_caption" width="15%" align="left">Pincode</TD>
+																		<TD class="td_element" width="35%"><input type="text" name="pinCode" value="" id="pinCode" style="width:200px;" maxlength="6" autocomplete="off" /></TD>		
+																	</TR>
+																	
+																	<TR>
+																		<TD class="td_caption" width="15%" align="left">Payment Mode</TD>
+																		<TD class="td_element" width="35%">
+																			<select name="PaymentMode" id="PaymentMode" style="width:200px;">
+<option value="0">-Select-</option>
+<option value="1">Offline</option>
+<option value="2">Online</option>
+<option value="3">Both(Online/Offline)</option>
+<option value="4">Not Applicable</option>
+</select>
+																		</TD>
+																	</TR>	
+																	
+																	<TR>
+																		<TD class="td_caption" width="15%" align="left">Value Criteria</TD>
+																		<TD class="td_element" width="35%">
+							 									 			<select name="valueCriteria" id="valueCriteria" style="width:200px;">
+<option value="0">-Select-</option>
+<option value="1">EMD</option>
+<option value="2">Tender Fee</option>
+<option value="3">Processing Fee</option>
+<option value="4">ECV</option>
+</select>
+																		</TD>
+																		<TD class="td_element" width="15%" align="left">
+							 									 			<select name="valueParameter" id="valueParameter" onchange="doEnableDisable()" style="width:140px;">
+<option value="0">-Select-</option>
+<option value="1">Equal</option>
+<option value="2">LessThan</option>
+<option value="3">GreaterThan</option>
+<option value="4">Between</option>
+</select>
+																		</TD>
+																		<TD class="td_element" width="35%">
+																			<input type="text" name="FromValue" value="" id="FromValue" style="width:95px;" autocomplete="off" maxlength="15" />&nbsp;
+																			<input type="text" name="ToValue" value="" id="ToValue" style="width:95px;" autocomplete="off" maxlength="15" />
+																		</TD>
+																	</TR>
+																	
+																	<TR>
+																		<TD class="td_caption" width="15%" align="left">Date Criteria</TD>
+																		<TD class="td_element" width="35%">
+							 									 			<select name="dateCriteria" id="dateCriteria" style="width:200px;">
+<option value="0">-Select-</option>
+<option value="1">Published Date</option>
+<option value="2">Document Download Start Date</option>
+<option value="3">Document Download End Date</option>
+<option value="4">Bid Submission Start Date</option>
+<option value="5">Bid Submission End Date</option>
+</select>
+																		</TD>
+																		<TD class="td_caption" width="15%" align="left">From&nbsp;<input type="text" name="fromDate" value="" title="dd/MM/yyyy" id="fromDate" readonly="readonly" style="width:75px;" />&nbsp;<a href="javascript:calendar_fromDate.toggle(tapestry.byId(&quot;fromDate&quot;));"><img src="/nicgep/app?service=asset&amp;path=%2Forg%2Fapache%2Ftapestry%2Fform%2FDatePickerIcon.png" alt="Click on icon to choose a date/time value." border="0" class="datePickerImg" /></a></TD>
+																		<TD class="td_caption" width="35%" align="left">To&nbsp;<input type="text" name="toDate" value="" title="dd/MM/yyyy" id="toDate" readonly="readonly" style="width:150px;" />&nbsp;<a href="javascript:calendar_toDate.toggle(tapestry.byId(&quot;toDate&quot;));"><img src="/nicgep/app?service=asset&amp;path=%2Forg%2Fapache%2Ftapestry%2Fform%2FDatePickerIcon.png" alt="Click on icon to choose a date/time value." border="0" class="datePickerImg" /></a></TD>
+																	</TR>
+																	
+																	<TR>
+																		<TD class="td_caption" width="15%" align="left">Selection Criteria</TD>
+																		<TD class="td_element" width="35%" valign="top">
+																			<input type="checkbox" name="twoStageAllowed" id="twoStageAllowed" class="sans_style" /><label for="twoStageAllowed">Two Stage Bidding</label><br>
+							 									 			<input type="checkbox" name="ndaAllowed" id="ndaAllowed" class="sans_style" /><label for="ndaAllowed">NDA Tenders</label><br>
+							 									 			<input type="checkbox" name="prefBidAllowed" id="prefBidAllowed" class="sans_style" /><label for="prefBidAllowed">Preferential Bidding</label>
+							 									 		</TD>
+																		<TD class="td_element" width="15%" valign="top">
+																			<input type="checkbox" name="chkGteAllowed" id="chkGteAllowed" class="sans_style" /><label for="chkGteAllowed">GTE</label><br>
+							 									 			<input type="checkbox" name="chkIteAllowed" id="chkIteAllowed" class="sans_style" /><label for="chkIteAllowed">ITE / TPS</label>
+							 									 		</TD>
+							 									 		<TD class="td_element" width="35%" valign="top">
+							 									 			<input type="checkbox" name="chkTfeAllowed" id="chkTfeAllowed" class="sans_style" /><label for="chkTfeAllowed">Tender Fee Exemption</label><br>
+							 									 			<input type="checkbox" name="chkEfeAllowed" id="chkEfeAllowed" class="sans_style" /><label for="chkEfeAllowed">EMD Exemption</label>
+							 									 		</TD>
+																	</TR>
+																	
+																	<tr>
+																		<td colspan="6">
+																			 <table width="100%" cellspacing="0" cellpadding="0" class="list_table">
+																			   <tr >
+
+																						<td   align="middle">Enter Captcha</td>
+																						<td ><input type="text" name="captchaText" value="" id="captchaText" size="5" autocomplete="off" maxlength="6" style="width:200px;" /></td>
+
+																					   <td>
+																							<img name="captchaImage" id="captchaImage" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAL8AAAAuCAYAAAB50MjgAAAC1UlEQVR42u3dTY7DIAwFYK968znE
+nNYjzWzajtKA8fMPPKSsGqUBPhMgJBFhGkyqfxsTE/EzeJiY9sFvOke92KAnCvw/tlJnlhfxXxXC
+258xQNhYdMC/Xjc6uDER/7H4GQC1UR6If+3AxB/bZfIqz53xh0UVGv/hQdQe/1Z1enXCCPwjxzot
+KKrgR9TrVoWPavWJvw3+kZnBKnV3P/jNHrgQf438DuIlfuLviV8NG7s9xE/8xE/8p+FX4/FZ+IZW
+gvhzoXtdAab737Z9sYWvtn3MJ4/G75HfLPwr+85CD8b//PsQ/gtzc+5W5vlF/O/+ZuHPupttBS3B
++HUN/0xr/xGxaz2t3uF1vHyqxuNXVP/XG7/XIHQmj4H4h64Sxnq6DqbZit4Mvym/AfhfKkyT8COv
+TN51pYNluTxNhRw4ZeHPOqe7CvOYeZnFYw3+KPxu9eQBtDt+qYd/GZQXfmmEX1bxexZuB/zVpiS9
+MCHxaxP8uhOGk/Bn3n+xXjHb44f1r4jfPNsmBfBLIfxu3Wzir41fCuNXMH4h/rPwZy0Q8+hWED/x
+Dx/Sc6IAhH9o/X4kfvjUH/Hn4s8IgBX8dysD2uA/dbbH806nB36pgX9poF7+wXx1yvjO+EHnNI1f
+C+NHjlsy8cNet3E4/unpw6jVpXf1bwgALbnMfaBwPy6yCsTg8pDD7CBTCwR79II/mSj3CPywAHBa
+Odcaf7clzeggRJQnyund/jAMkoghA7/0wT/dUESuI7LmCz7PL5J74yWjpY16LeNqfpFvK856Ag+9
+nN580kD0w4OoyOBCPYrpsVwYXScZ+D3fFjFSr1VSSfxB46htP1kEmnBx+4/aJX7AmIL4D8afOZ0n
+4veKFa9uD1NcgJVr3ZMH1MRP/LXwd+9aCeGX6rqVKv8q69YJkvi7ZSj6CyT8DCu7PYdeNR7fX/q8
+0ZJLa0z89fH/r6z3YGBQlMf/m34AFjhSkh9e+J0AAAAASUVORK5CYII=" class="image_style"></img>
+																					   &nbsp; &nbsp;
+																						<button type="button" name="captcha" id="captcha" style="border:0px; background-color:transparent;"><img src="images/refresh_new.png" border="0"/> Refresh</button>
+																					   
+																					   </td>
+																				</tr>																			
+																			</table>
+																		</td>		
+																	</tr>
+																	<tr>
+																		<td colspan="6" class="notes">Provide Captcha and click on Search button to list all active tenders.</td>
+																	</tr>
+																</table>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>	
+											<tr><td>&nbsp</td></tr>	
+											<tr>
+												<td class="td_element" align="right"> 
+													<a id="clear" title="Clear" class="customButton_link" value="Clear" href="/nicgep/app?component=clear&amp;page=FrontEndAdvancedSearch&amp;service=direct&amp;session=T">Clear</a>&nbsp;&nbsp;
+													<input type="submit" name="submit" id="submit" border="0" onclick="return doCheck();" title="Search" class="customButton" value="Search" />
+												</td>
+											</tr>
+									  </table>
+									  <!-- END: interface_elements -->
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>								
+				</table>
+				<!-- End : Content Area -->
+				<script language="javascript" >
+					doEnableDisable();
+				</script>
+			</td>
+		</tr>
+	</table>
+</form>
+
+							<!-- Page content ends here -->	
+							</td>				
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td valign="bottom" height="40">
+					<table width="100%" cellspacing="0" cellpadding="0">
+	 <tr style="background-color:#E8E8E8;"> 
+	 <td height="25" class="text2" align="center"><b>Visitor No:7297990</b></td>
+		
+	  </tr>
+	 <tr style="background-color:#E8E8E8;"> 
+	
+		<td height="25" class="text2" align="center">Contents owned and maintained by concerned Departments in coordination with Finance Department and Information Technology Department, Government of Odisha		  
+		 </td>
+	  </tr>
+	  <tr valign="top" class="secondaryBg"> 
+		<td>
+			<table width="100%" height="22" border="0" cellpadding="1" cellspacing="1">
+
+				
+				<tr class="footer">
+					<td width="40%" valign="top" align="left">Designed, Developed and Hosted by<br/>  <a href="http://www.nic.in" target="_blank" rel="noopener noreferrer" class="footerlink">National Informatics Centre</a></td>
+					<td width="40%" align="left">
+						 Version : 1.09.23 04-Feb-2026<br />
+						(c) 2017 Tenders NIC, All rights reserved.<br/>Site best viewed with a screen resolution 1920 x 1080.</td>					
+					<td width="20%" valign="top" align="right"><a id="PageLink_16" class="footerlink" href="/nicgep/app?page=Disclaimer&amp;service=page">Portal policies</a></td>
+				</tr>
+			</table>
+		</td>
+	  </tr>
+</table>
+				</td>
+			</tr>
+			<tr>
+			    <td>
+			        <form method="post" action="/nicgep/app" id="WebBorder_0">
+<div style="display:none;" id="WebBorder_0hidden"><input type="hidden" name="formids" value="domainUrl" />
+<input type="hidden" name="seedids" value="ZH4sIAAAAAAAAAF2TzXKbMBDHPZPpm3DUwZA2SY/+iDPMJK4n0OTokdFiNBZajRCm7jP11foOXSE84F7g/9Ou9hP+/J19+T2b3X3e/WQN2LMsIJozw4/+VWBtUIN2vdaOSw2WdANNI1F7ZejxCYclWkGmmKWaorgoSVhWgVJkXehL9MCWKC7BNUez5DoEUlKf4ugbS8vofs42aKPkO8F+HiX37Fk1EMVPQ8h9TFEGmZCssIZXuk5RdlStl/uHKTyGdFt0oSfdiw8JHZVpQVO9fVHxYHnHjrykA0uqiRImdYm25oo8OsuNAUHqGj6KH8dUTyHVK5TuDXRL9ALUoCyGAidErX1leZ99Ic5cFyAy4LaoyM3hCXQGhQU/8OCUX4wv3vWQCpI/7JFr2XBHG9jyerS+Q7lFojUYbl0d1tahPaUO6lw65V3X8iyH3YVbK+7giNYvJ2sPE/POomgLN7H7cazoM7C88KGN1CsU0M/84tO9BTpz1cLK+klKfuUdt1Sr67e+sVh/+EPfJV6VoESTWyU5remon8tVdJg5GvpCKezAD0MLPoKxUC6lGA+K6vTi4IbT/zgvb/n5hrlxRcVz+OVGSuvh5wjolaIN+p+hPdTShW9hg9g3+w+bdDw6YAMAAA==" />
+<input type="hidden" name="component" value="$WebBorder.WebBorder" />
+<input type="hidden" name="page" value="FrontEndAdvancedSearch" />
+<input type="hidden" name="service" value="direct" />
+<input type="hidden" name="session" value="T" />
+<input type="hidden" name="submitmode" value="" />
+<input type="hidden" name="submitname" value="" />
+<input type="hidden" name="domainUrl" id="domainUrl" value="Shttps://tendersodisha.gov.in/nicgep/app" />
+</div>
+				       
+				   </form>
+			    </td>
+			</tr>
+		</table>
+	</div>
+<script type="text/javascript"><!--
+tapestry.addOnLoad(function(e) {
+dojo.require("tapestry.form");tapestry.form.registerForm("TenderAdvancedSearch");
+calendar_fromDate = new Calendar();
+
+	
+calendar_fromDate.initialize(["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  "dd/MM/yyyy", 0, false, 1, "Clear");
+calendar_fromDate.onchange = function() {
+  var field = tapestry.byId("TenderAdvancedSearch").fromDate;
+  var value = calendar_fromDate.formatDate();
+	if (field.value != value) {
+    field.value = value;
+    if (field.onchange) { field.onchange();}
+  }
+}
+calendar_toDate = new Calendar();
+
+	
+calendar_toDate.initialize(["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  "dd/MM/yyyy", 0, false, 1, "Clear");
+calendar_toDate.onchange = function() {
+  var field = tapestry.byId("TenderAdvancedSearch").toDate;
+  var value = calendar_toDate.formatDate();
+	if (field.value != value) {
+    field.value = value;
+    if (field.onchange) { field.onchange();}
+  }
+}
+
+tapestry.cleanConnect("OrganisationName", "onchange", "formEvent2043789357");
+                tapestry.formEvent2043789357=function(e){
+                    var content={beventname:"onchange", bcomponentidpath:"FrontEndAdvancedSearch/OrganisationName", bcomponentid:"OrganisationName"};
+                    tapestry.event.buildEventProperties(e, content, arguments);
+                    if (!content["beventtarget.id"]){
+                    	content["beventtarget.id"]="OrganisationName";
+                    }
+                    
+                   var validateState=tapestry.form.forms["TenderAdvancedSearch"].validateForm;
+                   var validateForm=false;
+                   tapestry.form.setFormValidating("TenderAdvancedSearch", validateForm);
+                   
+                    
+                    tapestry.form.submitAsync("TenderAdvancedSearch", content);
+                    
+                    
+                    
+                    tapestry.form.setFormValidating("TenderAdvancedSearch", validateState);
+                    
+                };
+                tapestry.connect("OrganisationName", "onchange", "formEvent2043789357");
+tapestry.cleanConnect("Department", "onchange", "formEvent1726968178");
+                tapestry.formEvent1726968178=function(e){
+                    var content={beventname:"onchange", bcomponentidpath:"FrontEndAdvancedSearch/Department", bcomponentid:"Department"};
+                    tapestry.event.buildEventProperties(e, content, arguments);
+                    if (!content["beventtarget.id"]){
+                    	content["beventtarget.id"]="Department";
+                    }
+                    
+                   var validateState=tapestry.form.forms["TenderAdvancedSearch"].validateForm;
+                   var validateForm=false;
+                   tapestry.form.setFormValidating("TenderAdvancedSearch", validateForm);
+                   
+                    
+                    tapestry.form.submitAsync("TenderAdvancedSearch", content);
+                    
+                    
+                    
+                    tapestry.form.setFormValidating("TenderAdvancedSearch", validateState);
+                    
+                };
+                tapestry.connect("Department", "onchange", "formEvent1726968178");
+tapestry.cleanConnect("Division", "onchange", "formEvent1389807549");
+                tapestry.formEvent1389807549=function(e){
+                    var content={beventname:"onchange", bcomponentidpath:"FrontEndAdvancedSearch/Division", bcomponentid:"Division"};
+                    tapestry.event.buildEventProperties(e, content, arguments);
+                    if (!content["beventtarget.id"]){
+                    	content["beventtarget.id"]="Division";
+                    }
+                    
+                   var validateState=tapestry.form.forms["TenderAdvancedSearch"].validateForm;
+                   var validateForm=false;
+                   tapestry.form.setFormValidating("TenderAdvancedSearch", validateForm);
+                   
+                    
+                    tapestry.form.submitAsync("TenderAdvancedSearch", content);
+                    
+                    
+                    
+                    tapestry.form.setFormValidating("TenderAdvancedSearch", validateState);
+                    
+                };
+                tapestry.connect("Division", "onchange", "formEvent1389807549");
+tapestry.cleanConnect("SubDivision", "onchange", "formEvent341858789");
+                tapestry.formEvent341858789=function(e){
+                    var content={beventname:"onchange", bcomponentidpath:"FrontEndAdvancedSearch/SubDivision", bcomponentid:"SubDivision"};
+                    tapestry.event.buildEventProperties(e, content, arguments);
+                    if (!content["beventtarget.id"]){
+                    	content["beventtarget.id"]="SubDivision";
+                    }
+                    
+                   var validateState=tapestry.form.forms["TenderAdvancedSearch"].validateForm;
+                   var validateForm=false;
+                   tapestry.form.setFormValidating("TenderAdvancedSearch", validateForm);
+                   
+                    
+                    tapestry.form.submitAsync("TenderAdvancedSearch", content);
+                    
+                    
+                    
+                    tapestry.form.setFormValidating("TenderAdvancedSearch", validateState);
+                    
+                };
+                tapestry.connect("SubDivision", "onchange", "formEvent341858789");
+tapestry.cleanConnect("captcha", "onclick", "formEvent140493356");
+                tapestry.formEvent140493356=function(e){
+                    var content={beventname:"onclick", bcomponentidpath:"FrontEndAdvancedSearch/captcha", bcomponentid:"captcha"};
+                    tapestry.event.buildEventProperties(e, content, arguments);
+                    if (!content["beventtarget.id"]){
+                    	content["beventtarget.id"]="captcha";
+                    }
+                    
+                   var validateState=tapestry.form.forms["TenderAdvancedSearch"].validateForm;
+                   var validateForm=false;
+                   tapestry.form.setFormValidating("TenderAdvancedSearch", validateForm);
+                   
+                    
+                    tapestry.form.submitAsync("TenderAdvancedSearch", content);
+                    
+                    
+                    
+                    tapestry.form.setFormValidating("TenderAdvancedSearch", validateState);
+                    
+                };
+                tapestry.connect("captcha", "onclick", "formEvent140493356");
+tapestry.form.registerForm("WebBorder_0");
+
+tapestry.form.focusField('TenderType');});
+// --></script></body>
+</html>
+
+<script type="text/javascript" src="includes/CsrfdeleteBlock.js"></script>	
+	
+<script language="javascript" >
+	
+	function doEnableDisable(){
+
+		var f = document.getElementById("TenderAdvancedSearch");
+		
+		if(f.valueParameter.options[f.valueParameter.selectedIndex].value == "4"){
+			f.ToValue.style.backgroundColor = "#FFFFFF";
+			f.ToValue.disabled = false;
+		}
+		else{
+			f.ToValue.value = "";
+			f.ToValue.style.backgroundColor = "#F0F0F0";
+			f.ToValue.disabled = true;
+		}
+		
+	}
+	function doCheck(){
+
+		var f = document.getElementById("TenderAdvancedSearch");
+		if(f.captchaText.value==0){
+		   	alert("Please enter Captcha.");
+		   	f.captchaText.focus();
+			return false;
+	   }
+	   
+	   if(f.captchaText.value.length!=6) {
+			alert("Invalid Captcha! Please Enter Correct Captcha");
+			f.captchaText.value = "";
+			f.captchaText.focus();
+			return false; 
+	   }
+	   
+	}
+			
+</script>

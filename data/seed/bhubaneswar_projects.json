@@ -1,0 +1,44 @@
+[
+  {
+    "id": "OR-BBSR-2024-001",
+    "title": "Construction of 4-Lane Flyover at Khandagiri Intersection",
+    "state": "Odisha",
+    "district": "Khordha",
+    "city": "Bhubaneswar",
+    "category": "ROAD",
+    "status": "IN_PROGRESS",
+    "budget": 1150000000,
+    "source_url": "https://tendersodisha.gov.in/tenders/OR-BBSR-2024-001",
+    "contractor": "Larsen & Toubro Limited",
+    "physical_progress": 45,
+    "financial_progress": 40
+  },
+  {
+    "id": "OR-BBSR-2024-002",
+    "title": "Upgradation of Capital Hospital to Super Specialty",
+    "state": "Odisha",
+    "district": "Khordha",
+    "city": "Bhubaneswar",
+    "category": "BUILDING",
+    "status": "DELAYED",
+    "budget": 2500000000,
+    "source_url": "https://tendersodisha.gov.in/tenders/OR-BBSR-2024-002",
+    "contractor": "Afcons Infrastructure Limited",
+    "physical_progress": 15,
+    "financial_progress": 25
+  },
+  {
+    "id": "OR-BBSR-2024-003",
+    "title": "Ekamra Kshetra Heritage Project Phase 1",
+    "state": "Odisha",
+    "district": "Khordha",
+    "city": "Bhubaneswar",
+    "category": "OTHER",
+    "status": "PLANNED",
+    "budget": 750000000,
+    "source_url": "https://bda.gov.in/projects/ekamra",
+    "contractor": null,
+    "physical_progress": 0,
+    "financial_progress": 5
+  }
+]

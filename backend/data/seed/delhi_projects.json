@@ -1,0 +1,34 @@
+[
+  {
+    "title": "Signature Bridge Maintenance",
+    "description": "Routine structural health monitoring and cable tensioning of the Signature Bridge.",
+    "state": "Delhi",
+    "city": "New Delhi",
+    "category": "BRIDGE",
+    "status": "IN_PROGRESS",
+    "sanctioned_budget_inr": 45000000,
+    "authority_name": "Delhi Tourism and Transportation Development Corporation",
+    "contractor_name": "Larsen & Toubro",
+    "original_end_date": "2026-12-31",
+    "lat": 28.7041,
+    "lng": 77.2213,
+    "source_url": "https://delhi.gov.in/tenders",
+    "source_document_id": "DEL-BR-001"
+  },
+  {
+    "title": "Dwarka Expressway Phase 4",
+    "description": "Construction of the final leg connecting Dwarka to the airport.",
+    "state": "Delhi",
+    "city": "Dwarka",
+    "category": "ROAD",
+    "status": "TENDERED",
+    "sanctioned_budget_inr": 1200000000,
+    "authority_name": "NHAI",
+    "contractor_name": "GR Infraprojects",
+    "original_end_date": "2027-06-15",
+    "lat": 28.5823,
+    "lng": 77.0500,
+    "source_url": "https://etenders.gov.in",
+    "source_document_id": "NHAI-DEL-99"
+  }
+]
