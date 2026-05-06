@@ -6,6 +6,8 @@ import {
   Search, MapPin, Shield, TrendingUp, Clock, Users,
   ChevronRight, Activity, ArrowRight, Eye, FileSearch,
   AlertTriangle, Landmark, HardHat, CheckCircle,
+  Route, Waves, Building2, Droplets, Zap, ShowerHead,
+  TrainFront, Construction,
 } from "lucide-react";
 import { HomeStats } from "@/components/home/HomeStats";
 import { HomeSearchBox } from "@/components/home/HomeSearchBox";
@@ -22,14 +24,14 @@ const HOW_STEPS = [
   {
     icon: <Eye size={22} className="text-purple-400" />,
     title: "See all the details",
-    desc: "View budget allocated, money spent, contractor name, responsible authority, and the full project timeline â€” all in one place.",
+    desc: "View budget allocated, money spent, contractor name, responsible authority, and the full project timeline - all in one place.",
     step: "02",
     color: "purple",
   },
   {
     icon: <Shield size={22} className="text-green-400" />,
     title: "Trust the data",
-    desc: "Every record is tagged with its source and verification status. Community-verified, government-verified, or disputed â€” you'll always know.",
+    desc: "Every record is tagged with its source and verification status. Community-verified, government-verified, or disputed - you'll always know.",
     step: "03",
     color: "green",
   },
@@ -43,14 +45,14 @@ const HOW_STEPS = [
 ];
 
 const CATEGORIES = [
-  { icon: "ðŸ›£ï¸", label: "Roads",        cat: "ROAD"       },
-  { icon: "ðŸŒ‰", label: "Bridges",      cat: "BRIDGE"     },
-  { icon: "ðŸ¢", label: "Buildings",    cat: "BUILDING"   },
-  { icon: "ðŸ’§", label: "Water",        cat: "WATER"      },
-  { icon: "âš¡", label: "Electricity",  cat: "ELECTRICITY"},
-  { icon: "ðŸš¿", label: "Sanitation",   cat: "SANITATION" },
-  { icon: "ðŸš‡", label: "Metro",        cat: "METRO"      },
-  { icon: "ðŸ—ï¸", label: "Other",       cat: "OTHER"      },
+  { icon: <Route size={24} />, label: "Roads", cat: "ROAD", color: "text-brand-400" },
+  { icon: <Waves size={24} />, label: "Bridges", cat: "BRIDGE", color: "text-cyan-400" },
+  { icon: <Building2 size={24} />, label: "Buildings", cat: "BUILDING", color: "text-purple-400" },
+  { icon: <Droplets size={24} />, label: "Water", cat: "WATER", color: "text-sky-400" },
+  { icon: <Zap size={24} />, label: "Electricity", cat: "ELECTRICITY", color: "text-yellow-400" },
+  { icon: <ShowerHead size={24} />, label: "Sanitation", cat: "SANITATION", color: "text-green-400" },
+  { icon: <TrainFront size={24} />, label: "Metro", cat: "METRO", color: "text-pink-400" },
+  { icon: <Construction size={24} />, label: "Other", cat: "OTHER", color: "text-orange-400" },
 ];
 
 const fadeIn = {
@@ -72,7 +74,7 @@ export default function HomePage() {
     <div className="min-h-screen overflow-x-hidden">
       <Navbar />
 
-      {/* â”€â”€ Hero â”€â”€ */}
+      {/* Hero */}
       <section className="relative overflow-hidden bg-hero-gradient">
         <div className="absolute inset-0 pointer-events-none">
           <motion.div 
@@ -125,7 +127,7 @@ export default function HomePage() {
               className="inline-flex items-center gap-2 bg-brand-900/60 border border-brand-700/50 text-brand-300 text-xs font-semibold px-3 py-1.5 rounded-full mb-6"
             >
               <Activity size={12} className="animate-pulse-slow" />
-              Phase 1 Live â€” Bhubaneswar, Odisha
+              Phase 1 Live - Bhubaneswar, Odisha
             </motion.div>
 
             <motion.h1 
@@ -144,7 +146,7 @@ export default function HomePage() {
               className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed mb-10 max-w-2xl"
             >
               Search any road, bridge, flyover, or public building near you. See who built it, how much was allocated, 
-              how much has been spent, and whether it's delayed â€” all from verified government data.
+              how much has been spent, and whether it's delayed - all from verified government data.
             </motion.p>
 
             <motion.div variants={fadeIn}>
@@ -182,10 +184,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* â”€â”€ Stats â”€â”€ */}
+      {/* Stats */}
       <HomeStats />
 
-      {/* â”€â”€ Browse by Category â”€â”€ */}
+      {/* Browse by Category */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -209,7 +211,7 @@ export default function HomePage() {
                 href={`/projects?category=${c.cat}`}
                 className="glass-card glass-card-hover p-4 flex flex-col items-center gap-2 text-center group h-full"
               >
-                <span className="text-2xl group-hover:scale-110 transition-transform duration-300">{c.icon}</span>
+                <span className={`${c.color} group-hover:scale-110 transition-transform duration-300`}>{c.icon}</span>
                 <span className="text-xs text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors font-medium">{c.label}</span>
               </Link>
             </motion.div>
@@ -217,7 +219,7 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* â”€â”€ How It Works â”€â”€ */}
+      {/* How It Works */}
       <section className="py-20 bg-surface-800-40 border-y border-slate-900/5 dark:border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div 
@@ -228,7 +230,7 @@ export default function HomePage() {
           >
             <h2 className="font-display text-3xl font-bold text-slate-900 dark:text-white mb-3">How InfraSight Works</h2>
             <p className="text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
-              From raw government data to a single transparent view â€” in four simple steps.
+              From raw government data to a single transparent view - in four simple steps.
             </p>
           </motion.div>
           <motion.div 
@@ -256,7 +258,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* â”€â”€ Who is this for â”€â”€ */}
+      {/* Who is this for */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -299,7 +301,7 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* â”€â”€ CTA â”€â”€ */}
+      {/* CTA */}
       <section className="pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
@@ -329,7 +331,7 @@ export default function HomePage() {
       </section>
 
       <footer className="border-t border-slate-900/8 dark:border-white/8 py-8 text-center text-sm text-slate-600">
-        InfraSight â€” Built for public accountability &bull; Phase 1: Bhubaneswar &bull; Data sourced from official government portals
+        InfraSight - Built for public accountability &bull; Phase 1: Bhubaneswar &bull; Data sourced from official government portals
       </footer>
     </div>
   );

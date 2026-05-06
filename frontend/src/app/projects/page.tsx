@@ -177,7 +177,7 @@ function ProjectsContent() {
                 ? "Unable to load projects"
                 : data
                   ? `${data.total.toLocaleString()} projects found`
-                  : "Loadingâ€¦"}
+                  : "Loading..."}
             </p>
           </div>
 
@@ -214,7 +214,7 @@ function ProjectsContent() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                placeholder="Search projectsâ€¦"
+                placeholder="Search projects..."
                 className="input-dark pl-9 py-2 text-sm"
               />
             </div>

@@ -96,7 +96,7 @@ export function ProjectMap({ pins, onSelectPin, className = "", userLocation }: 
             </div>
             <a href="/projects/${pin.id}"
                style="display:inline-block;margin-top:8px;font-size:11px;color:#38bdf8;text-decoration:none">
-              View details â†’
+              View details
             </a>
           </div>
         `, { maxWidth: 260 });
@@ -142,7 +142,7 @@ export function ProjectMap({ pins, onSelectPin, className = "", userLocation }: 
   if (!loaded) {
     return (
       <div className={`flex items-center justify-center bg-surface-800 rounded-xl ${className}`}>
-        <div className="text-slate-600 dark:text-slate-500 text-sm">Loading mapâ€¦</div>
+        <div className="text-slate-600 dark:text-slate-500 text-sm">Loading map...</div>
       </div>
     );
   }

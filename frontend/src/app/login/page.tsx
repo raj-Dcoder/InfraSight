@@ -79,7 +79,7 @@ export default function LoginPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@infrasight.gov"
+                    placeholder="admin@infrasight.com"
                     className="input-dark pl-11 py-3 w-full"
                     disabled={loading}
                   />
@@ -100,7 +100,7 @@ export default function LoginPage() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                    placeholder="Enter your password"
                     className="input-dark pl-11 py-3 w-full"
                     disabled={loading}
                   />

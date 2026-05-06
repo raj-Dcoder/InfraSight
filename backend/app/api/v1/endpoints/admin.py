@@ -1,16 +1,38 @@
 """
 Admin endpoints — data management, pipeline triggers, stats.
 """
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 from app.core.database import get_db
 from app.core.auth import require_admin
-from app.models.project import Project, Complaint, ProjectStatus, VerificationStatus
+from app.models.project import Project, Complaint, ProjectStatus, VerificationStatus, DataSource, DataSourceType
 from app.models.user import User
+from app.schemas.schemas import IngestionScopeRequest
 
 router = APIRouter()
+
+
+def _default_source_details(source_type: DataSourceType) -> tuple[str, str]:
+    if source_type == DataSourceType.TENDER_SYSTEM:
+        return "Odisha eProcurement Scoped Import", "https://tendersodisha.gov.in"
+    if source_type == DataSourceType.GOVERNMENT_PORTAL:
+        return "PMGSY Scoped Import", "https://pmgsy.nic.in"
+    return "Manual JSON Scoped Import", "local"
+
+
+def _scope_config(payload: IngestionScopeRequest) -> dict:
+    data = payload.model_dump(
+        mode="json",
+        exclude={"source_id", "source_type", "source_name", "base_url"},
+        exclude_none=True,
+    )
+    if payload.source_type == DataSourceType.MANUAL_ENTRY and "seed_dir" not in data:
+        data["seed_dir"] = "data/seed"
+    if payload.state and payload.source_type == DataSourceType.GOVERNMENT_PORTAL:
+        data["states"] = [payload.state]
+    return data
 
 
 @router.get("/stats")
@@ -58,6 +80,72 @@ async def trigger_ingestion(
     else:
         task = celery_app.send_task("app.workers.tasks.run_all_scrapers")
     return {"status": "triggered", "task_id": task.id}
+
+
+@router.post("/ingest/run-now")
+async def run_ingestion_now(
+    payload: IngestionScopeRequest,
+    db: AsyncSession = Depends(get_db),
+    admin: User = Depends(require_admin),
+):
+    """
+    Run a scoped ingestion immediately without Celery.
+
+    This is the free-deployment path: one admin action runs the selected scraper
+    inside the API process and inserts matching projects into the database.
+    """
+    default_name, default_url = _default_source_details(payload.source_type)
+    config = _scope_config(payload)
+
+    if payload.source_id:
+        source = (await db.execute(
+            select(DataSource).where(DataSource.id == payload.source_id)
+        )).scalar_one_or_none()
+        if not source:
+            raise HTTPException(status_code=404, detail="Data source not found")
+
+        source.scraper_config = {**(source.scraper_config or {}), **config}
+        if payload.base_url:
+            source.base_url = payload.base_url
+        source.is_active = True
+        await db.commit()
+        source_id = str(source.id)
+    else:
+        source_name = payload.source_name or default_name
+        source = (await db.execute(
+            select(DataSource).where(
+                DataSource.name == source_name,
+                DataSource.source_type == payload.source_type,
+            )
+        )).scalar_one_or_none()
+
+        if source:
+            source.scraper_config = config
+            source.base_url = payload.base_url or source.base_url or default_url
+            source.is_active = True
+        else:
+            source = DataSource(
+                name=source_name,
+                source_type=payload.source_type,
+                base_url=payload.base_url or default_url,
+                description="Admin-triggered scoped ingestion source",
+                scraper_config=config,
+                is_active=True,
+            )
+            db.add(source)
+
+        await db.flush()
+        source_id = str(source.id)
+        await db.commit()
+
+    from app.ingestion.scheduler import run_single_scraper
+    result = await run_single_scraper(source_id)
+    return {
+        "status": "completed",
+        "source_id": source_id,
+        "scope": config,
+        "result": result,
+    }
 
 
 @router.get("/complaints/pending")

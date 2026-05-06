@@ -55,6 +55,85 @@ class BaseScraper(ABC):
         key = json.dumps(data, sort_keys=True, default=str)
         return hashlib.sha256(key.encode()).hexdigest()
 
+    def _scope_value(self, key: str) -> Optional[str]:
+        value = self.config.get(key)
+        if value is None:
+            return None
+        return str(value).strip().lower()
+
+    def _keyword_match(self, *values: Optional[str]) -> bool:
+        keywords = [str(k).strip().lower() for k in self.config.get("keywords", []) if str(k).strip()]
+        if not keywords:
+            return True
+        haystack = " ".join(str(v or "").lower() for v in values)
+        return any(keyword in haystack for keyword in keywords)
+
+    def _record_matches_scope(self, record: dict) -> bool:
+        for key in ("state", "district", "city"):
+            expected = self._scope_value(key)
+            if expected and str(record.get(key, "")).strip().lower() != expected:
+                return False
+
+        expected_category = self._scope_value("category")
+        if expected_category and str(record.get("category", "")).strip().upper() != expected_category.upper():
+            return False
+
+        text_fields = [
+            record.get("title"),
+            record.get("description"),
+            record.get("department"),
+            record.get("authority"),
+            record.get("source_document_id"),
+        ]
+        if not self._keyword_match(*text_fields):
+            return False
+
+        return self._date_in_scope(record)
+
+    def _parse_date(self, value) -> Optional[date]:
+        if not value:
+            return None
+        if isinstance(value, date):
+            return value
+        try:
+            return datetime.fromisoformat(str(value)[:10]).date()
+        except ValueError:
+            return None
+
+    def _date_in_scope(self, record: dict) -> bool:
+        date_from = self._parse_date(self.config.get("date_from"))
+        date_to = self._parse_date(self.config.get("date_to"))
+        if not date_from and not date_to:
+            return True
+
+        candidates = [
+            self._parse_date(record.get("date")),
+            self._parse_date(record.get("published_date")),
+            self._parse_date(record.get("tender_date")),
+            self._parse_date(record.get("sanctioned_date")),
+            self._parse_date(record.get("start_date")),
+            self._parse_date(record.get("end_date")),
+            self._parse_date(record.get("original_end_date")),
+        ]
+        known_dates = [d for d in candidates if d is not None]
+        if not known_dates:
+            return True
+
+        return any(
+            (date_from is None or candidate >= date_from)
+            and (date_to is None or candidate <= date_to)
+            for candidate in known_dates
+        )
+
+    def _configured_category(self, default: ProjectCategory) -> ProjectCategory:
+        category = self.config.get("category")
+        if not category:
+            return default
+        try:
+            return ProjectCategory[str(category).upper()]
+        except KeyError:
+            return default
+
     async def _upsert_project(
         self,
         db,
@@ -135,10 +214,13 @@ class PMGSYScraper(BaseScraper):
     async def run(self, source) -> dict:
         inserted = 0
         found = 0
+        requested_category = self._scope_value("category")
+        if requested_category and requested_category != ProjectCategory.ROAD.value.lower():
+            return {"found": 0, "inserted": 0, "updated": 0, "skipped": 0}
 
         # PMGSY provides state-wise road project data
         # This is the known public URL pattern for road projects
-        states_to_scrape = self.config.get("states", ["Odisha"])
+        states_to_scrape = self.config.get("states") or [self.config.get("state") or "Odisha"]
 
         for state in states_to_scrape:
             url = f"{source.base_url}/stateprojects/{state.lower().replace(' ', '_')}"
@@ -161,6 +243,17 @@ class PMGSYScraper(BaseScraper):
                     title = cells[1].get_text(strip=True)
                     district = cells[2].get_text(strip=True)
                     budget_text = cells[3].get_text(strip=True).replace(",", "").replace("₹", "")
+                    city = self.config.get("city")
+
+                    candidate = {
+                        "title": title,
+                        "state": state,
+                        "district": district,
+                        "city": city,
+                        "category": ProjectCategory.ROAD.value,
+                    }
+                    if not self._record_matches_scope(candidate):
+                        continue
 
                     try:
                         budget = float(budget_text) if budget_text else None
@@ -172,6 +265,7 @@ class PMGSYScraper(BaseScraper):
                         source=source,
                         title=title or f"PMGSY Road Project {project_id}",
                         state=state,
+                        city=city,
                         district=district,
                         category=ProjectCategory.ROAD,
                         status=ProjectStatus.IN_PROGRESS,
@@ -195,6 +289,7 @@ class OdishaEProcScraper(BaseScraper):
     async def run(self, source) -> dict:
         inserted = 0
         found = 0
+        skipped = 0
 
         search_url = (
             f"{source.base_url}/nicgep/app?component=%24DirectLink&page=FrontEndAdvancedSearch"
@@ -220,14 +315,33 @@ class OdishaEProcScraper(BaseScraper):
                 dept = cells[1].get_text(strip=True)
                 link_tag = cells[2].find("a")
                 source_url = f"{source.base_url}{link_tag['href']}" if link_tag else None
+                state = self.config.get("state") or "Odisha"
+                city = self.config.get("city") or "Bhubaneswar"
+                district = self.config.get("district")
+                category = self._configured_category(ProjectCategory.ROAD)
+
+                candidate = {
+                    "title": title,
+                    "description": dept,
+                    "department": dept,
+                    "state": state,
+                    "district": district,
+                    "city": city,
+                    "category": category.value,
+                    "source_document_id": tender_id,
+                }
+                if not self._record_matches_scope(candidate):
+                    skipped += 1
+                    continue
 
                 ok, _ = await self._upsert_project(
                     db=db,
                     source=source,
                     title=title or f"Odisha PWD Tender {tender_id}",
-                    state="Odisha",
-                    city="Bhubaneswar",
-                    category=ProjectCategory.ROAD,
+                    state=state,
+                    city=city,
+                    district=district,
+                    category=category,
                     status=ProjectStatus.TENDERED,
                     source_url=source_url,
                     source_doc_id=f"odisha_tender_{tender_id}",
@@ -236,7 +350,7 @@ class OdishaEProcScraper(BaseScraper):
                 if ok:
                     inserted += 1
 
-        return {"found": found, "inserted": inserted, "updated": 0}
+        return {"found": found, "inserted": inserted, "updated": 0, "skipped": skipped}
 
 
 class ManualDataScraper(BaseScraper):
@@ -252,6 +366,7 @@ class ManualDataScraper(BaseScraper):
         seed_dir = self.config.get("seed_dir", "/app/data/seed")
         inserted = 0
         found = 0
+        skipped = 0
 
         for fname in os.listdir(seed_dir):
             if not fname.endswith(".json"):
@@ -269,6 +384,15 @@ class ManualDataScraper(BaseScraper):
             async with AsyncSessionLocal() as db:
                 for record in records:
                     try:
+                        candidate = {
+                            **record,
+                            "category": record.get("category", "ROAD"),
+                            "source_document_id": record.get("id", record.get("source_document_id")),
+                        }
+                        if not self._record_matches_scope(candidate):
+                            skipped += 1
+                            continue
+
                         ok, _ = await self._upsert_project(
                             db=db,
                             source=source,
@@ -296,7 +420,7 @@ class ManualDataScraper(BaseScraper):
                 await db.commit()
             print(f"Finished processing {fname}. Inserted: {inserted}")
 
-        return {"found": found, "inserted": inserted, "updated": 0}
+        return {"found": found, "inserted": inserted, "updated": 0, "skipped": skipped}
 
 
 def get_scraper(source_type: str, config: dict) -> BaseScraper:

@@ -59,7 +59,7 @@ export function HomeSearchBox() {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search projects, roads, bridgesâ€¦"
+            placeholder="Search projects, roads, bridges..."
             className="input-dark pl-11 py-3 text-sm focus:ring-2 focus:ring-brand-500/20 transition-all"
           />
         </div>

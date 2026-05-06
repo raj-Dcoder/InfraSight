@@ -7,7 +7,8 @@ from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.models.project import (
-    ProjectStatus, ProjectCategory, VerificationStatus, ComplaintStatus
+    ProjectStatus, ProjectCategory, VerificationStatus, ComplaintStatus,
+    DataSourceType
 )
 
 
@@ -319,3 +320,23 @@ class ProjectSearchParams(BaseModel):
     page_size: int = Field(20, ge=1, le=100)
     sort_by: str = "created_at"
     sort_dir: str = "desc"
+
+
+# ─────────────────────────────────────────
+# Ingestion Schemas
+# ─────────────────────────────────────────
+
+class IngestionScopeRequest(BaseModel):
+    """Admin-selected scope for a manual ingestion run."""
+    source_id: Optional[UUID] = None
+    source_type: DataSourceType = DataSourceType.MANUAL_ENTRY
+    source_name: Optional[str] = None
+    base_url: Optional[str] = None
+    state: Optional[str] = None
+    district: Optional[str] = None
+    city: Optional[str] = None
+    category: Optional[ProjectCategory] = None
+    keywords: List[str] = []
+    date_from: Optional[date] = None
+    date_to: Optional[date] = None
+    seed_dir: Optional[str] = None

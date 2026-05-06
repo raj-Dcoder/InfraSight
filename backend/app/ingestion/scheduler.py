@@ -65,6 +65,7 @@ async def run_single_scraper(source_id: str):
                     records_found=result.get("found", 0),
                     records_inserted=result.get("inserted", 0),
                     records_updated=result.get("updated", 0),
+                    records_skipped=result.get("skipped", 0),
                 )
             )
             # Update last scraped timestamp

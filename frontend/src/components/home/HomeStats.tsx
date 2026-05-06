@@ -36,7 +36,7 @@ export function HomeStats() {
           viewport={{ once: true }}
           className="font-display text-2xl font-bold text-slate-900 dark:text-white mb-10 text-center"
         >
-          Platform Statistics â€” Bhubaneswar Phase 1
+          Platform Statistics - Bhubaneswar Phase 1
         </motion.h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {displayStats.map((stat, idx) => (

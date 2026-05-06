@@ -20,17 +20,31 @@ import {
   Loader2,
   Edit3,
   Search as SearchIcon,
-  ExternalLink
+  ExternalLink,
+  PlayCircle,
+  Database
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { ProjectEditModal } from "@/components/admin/ProjectEditModal";
 import { projectsApi } from "@/lib/api";
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<"stats" | "complaints" | "verify" | "manage">("stats");
+  const [activeTab, setActiveTab] = useState<"stats" | "ingest" | "complaints" | "verify" | "manage">("stats");
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const [editingProject, setEditingProject] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isIngesting, setIsIngesting] = useState(false);
+  const [ingestionResult, setIngestionResult] = useState<any | null>(null);
+  const [ingestionForm, setIngestionForm] = useState({
+    source_type: "MANUAL_ENTRY",
+    state: "Odisha",
+    district: "",
+    city: "Bhubaneswar",
+    category: "ROAD",
+    keywords: "road, bridge, drain, PWD",
+    date_from: "",
+    date_to: "",
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -80,6 +94,40 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleIngestionChange = (field: string, value: string) => {
+    setIngestionForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleRunIngestion = async () => {
+    const payload: Record<string, unknown> = {
+      source_type: ingestionForm.source_type,
+      state: ingestionForm.state || undefined,
+      district: ingestionForm.district || undefined,
+      city: ingestionForm.city || undefined,
+      category: ingestionForm.category || undefined,
+      keywords: ingestionForm.keywords
+        .split(",")
+        .map(item => item.trim())
+        .filter(Boolean),
+      date_from: ingestionForm.date_from || undefined,
+      date_to: ingestionForm.date_to || undefined,
+    };
+
+    try {
+      setIsIngesting(true);
+      setIngestionResult(null);
+      const response = await adminApi.runIngestion(payload);
+      setIngestionResult(response.data);
+      mutate("admin-stats");
+      mutate("admin-projects");
+      toast.success("Ingestion completed");
+    } catch (e: any) {
+      toast.error(e?.response?.data?.detail || "Ingestion failed");
+    } finally {
+      setIsIngesting(false);
+    }
+  };
+
   if (isAuthorized === null) {
     return (
       <div className="min-h-screen bg-surface-950 flex flex-col items-center justify-center text-slate-600 dark:text-slate-400">
@@ -101,7 +149,7 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-4 border-b border-slate-900/10 dark:border-white/10 mb-6 overflow-x-auto">
-          {(["stats", "complaints", "verify", "manage"] as const).map(tab => (
+          {(["stats", "ingest", "complaints", "verify", "manage"] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -112,6 +160,7 @@ export default function AdminDashboard() {
               }`}
             >
               {tab === "stats" && "Platform Stats"}
+              {tab === "ingest" && "Ingest Data"}
               {tab === "complaints" && `Complaints (${complaints?.length || 0})`}
               {tab === "verify" && `Queue (${unverifiedProjects?.length || 0})`}
               {tab === "manage" && "Manage Projects"}
@@ -137,6 +186,146 @@ export default function AdminDashboard() {
                       <span className="text-sm text-slate-900 dark:text-white font-medium">{String(count)}</span>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "ingest" && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="glass-card p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Database className="text-brand-400" size={22} />
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Scoped Project Ingestion</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <label className="space-y-2">
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Source</span>
+                  <select
+                    value={ingestionForm.source_type}
+                    onChange={(e) => handleIngestionChange("source_type", e.target.value)}
+                    className="input-dark w-full"
+                  >
+                    <option value="MANUAL_ENTRY">Manual JSON</option>
+                    <option value="TENDER_SYSTEM">Odisha eProcurement</option>
+                    <option value="GOVERNMENT_PORTAL">PMGSY</option>
+                  </select>
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">State</span>
+                  <input
+                    value={ingestionForm.state}
+                    onChange={(e) => handleIngestionChange("state", e.target.value)}
+                    className="input-dark w-full"
+                    placeholder="Odisha"
+                  />
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">District</span>
+                  <input
+                    value={ingestionForm.district}
+                    onChange={(e) => handleIngestionChange("district", e.target.value)}
+                    className="input-dark w-full"
+                    placeholder="Khordha"
+                  />
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">City</span>
+                  <input
+                    value={ingestionForm.city}
+                    onChange={(e) => handleIngestionChange("city", e.target.value)}
+                    className="input-dark w-full"
+                    placeholder="Bhubaneswar"
+                  />
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Category</span>
+                  <select
+                    value={ingestionForm.category}
+                    onChange={(e) => handleIngestionChange("category", e.target.value)}
+                    className="input-dark w-full"
+                  >
+                    <option value="ROAD">Road</option>
+                    <option value="BRIDGE">Bridge</option>
+                    <option value="BUILDING">Building</option>
+                    <option value="WATER">Water</option>
+                    <option value="SANITATION">Sanitation</option>
+                    <option value="ELECTRICITY">Electricity</option>
+                    <option value="RAILWAY">Railway</option>
+                    <option value="METRO">Metro</option>
+                    <option value="PORT">Port</option>
+                    <option value="AIRPORT">Airport</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Keywords</span>
+                  <input
+                    value={ingestionForm.keywords}
+                    onChange={(e) => handleIngestionChange("keywords", e.target.value)}
+                    className="input-dark w-full"
+                    placeholder="road, bridge, PWD"
+                  />
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">From</span>
+                  <input
+                    type="date"
+                    value={ingestionForm.date_from}
+                    onChange={(e) => handleIngestionChange("date_from", e.target.value)}
+                    className="input-dark w-full"
+                  />
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-xs font-medium text-slate-600 dark:text-slate-400">To</span>
+                  <input
+                    type="date"
+                    value={ingestionForm.date_to}
+                    onChange={(e) => handleIngestionChange("date_to", e.target.value)}
+                    className="input-dark w-full"
+                  />
+                </label>
+              </div>
+
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <button
+                  onClick={handleRunIngestion}
+                  disabled={isIngesting}
+                  className="btn-primary"
+                >
+                  {isIngesting ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <PlayCircle size={18} />
+                  )}
+                  Run Ingestion
+                </button>
+                <p className="text-xs text-slate-600 dark:text-slate-500">
+                  Runs immediately on the backend and inserts matching Indian infrastructure projects.
+                </p>
+              </div>
+            </div>
+
+            {ingestionResult && (
+              <div className="glass-card p-6">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Last Ingestion Result</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <ResultMetric label="Found" value={ingestionResult.result?.found} />
+                  <ResultMetric label="Inserted" value={ingestionResult.result?.inserted} />
+                  <ResultMetric label="Updated" value={ingestionResult.result?.updated} />
+                  <ResultMetric label="Skipped" value={ingestionResult.result?.skipped} />
+                </div>
+                <div className="mt-4 text-xs text-slate-600 dark:text-slate-500 break-all">
+                  Source ID: {ingestionResult.source_id}
                 </div>
               </div>
             )}
@@ -201,7 +390,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="flex items-center gap-4 text-xs text-slate-600 dark:text-slate-500 mt-4">
                     <Link href={`/projects/${p.id}`} className="text-brand-400 hover:underline">View Local Page</Link>
-                    {p.source_url && <a href={p.source_url} target="_blank" className="text-brand-400 hover:underline">Verify Source Data â†—</a>}
+                    {p.source_url && <a href={p.source_url} target="_blank" className="text-brand-400 hover:underline">Verify Source Data</a>}
                   </div>
                 </div>
               ))
@@ -274,8 +463,17 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode, label: string
       </div>
       <div>
         <p className="text-slate-600 dark:text-slate-400 text-sm">{label}</p>
-        <p className="text-2xl font-bold text-slate-900 dark:text-white">{value !== undefined ? value : "â€”"}</p>
+        <p className="text-2xl font-bold text-slate-900 dark:text-white">{value !== undefined ? value : "-"}</p>
       </div>
+    </div>
+  );
+}
+
+function ResultMetric({ label, value }: { label: string, value?: number }) {
+  return (
+    <div className="rounded-lg border border-slate-900/10 dark:border-white/10 p-4">
+      <p className="text-xs text-slate-600 dark:text-slate-400">{label}</p>
+      <p className="text-xl font-semibold text-slate-900 dark:text-white">{value ?? 0}</p>
     </div>
   );
 }

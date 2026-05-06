@@ -82,6 +82,8 @@ export const adminApi = {
   stats: () => api.get("/admin/stats"),
   pendingComplaints: () => api.get("/admin/complaints/pending"),
   unverifiedProjects: () => api.get("/admin/projects/unverified"),
+  runIngestion: (data: Record<string, unknown>) =>
+    api.post("/admin/ingest/run-now", data, { timeout: 120000 }),
   verifyProject: (id: string, status: string) => 
     api.patch(`/projects/${id}/verify?verification_status=${status}`),
   moderateComplaint: (id: string, status: string) =>

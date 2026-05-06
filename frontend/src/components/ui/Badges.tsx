@@ -1,20 +1,36 @@
-﻿"use client";
+"use client";
 
 import {
   STATUS_LABELS,
   STATUS_BADGE_CLASS,
   TRUST_LABELS,
   TRUST_BADGE_CLASS,
-  CATEGORY_ICONS,
   CATEGORY_LABELS,
   formatINR,
-  formatDate,
   delayLabel,
 } from "@/lib/utils";
 import type { ProjectStatus, VerificationStatus, ProjectCategory } from "@/types";
-import { Clock, AlertTriangle, CheckCircle2, Circle } from "lucide-react";
+import {
+  AlertTriangle,
+  Anchor,
+  Building2,
+  CheckCircle2,
+  Circle,
+  Clock,
+  Construction,
+  Droplets,
+  HelpCircle,
+  Plane,
+  Route,
+  ShieldCheck,
+  ShowerHead,
+  TrainFront,
+  UsersRound,
+  Waves,
+  XCircle,
+  Zap,
+} from "lucide-react";
 
-// â”€â”€ StatusBadge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface StatusBadgeProps {
   status: ProjectStatus;
   showIcon?: boolean;
@@ -22,11 +38,12 @@ interface StatusBadgeProps {
 
 export function StatusBadge({ status, showIcon = true }: StatusBadgeProps) {
   const icons: Partial<Record<ProjectStatus, React.ReactNode>> = {
-    COMPLETED:   <CheckCircle2 size={11} />,
-    DELAYED:     <AlertTriangle size={11} />,
+    COMPLETED: <CheckCircle2 size={11} />,
+    DELAYED: <AlertTriangle size={11} />,
     IN_PROGRESS: <Clock size={11} />,
-    PLANNED:     <Circle size={11} />,
+    PLANNED: <Circle size={11} />,
   };
+
   return (
     <span className={STATUS_BADGE_CLASS[status]}>
       {showIcon && icons[status]}
@@ -35,19 +52,19 @@ export function StatusBadge({ status, showIcon = true }: StatusBadgeProps) {
   );
 }
 
-// â”€â”€ TrustBadge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface TrustBadgeProps {
   status: VerificationStatus;
 }
 
 export function TrustBadge({ status }: TrustBadgeProps) {
-  const icons: Record<string, string> = {
-    VERIFIED: "âœ“",
-    UNVERIFIED: "?",
-    COMMUNITY_VERIFIED: "ðŸ‘¥",
-    DISPUTED: "âš ",
-    RETRACTED: "âœ—",
+  const icons: Record<VerificationStatus, React.ReactNode> = {
+    VERIFIED: <ShieldCheck size={11} />,
+    UNVERIFIED: <HelpCircle size={11} />,
+    COMMUNITY_VERIFIED: <UsersRound size={11} />,
+    DISPUTED: <AlertTriangle size={11} />,
+    RETRACTED: <XCircle size={11} />,
   };
+
   return (
     <span className={TRUST_BADGE_CLASS[status]}>
       {icons[status]} {TRUST_LABELS[status]}
@@ -55,19 +72,32 @@ export function TrustBadge({ status }: TrustBadgeProps) {
   );
 }
 
-// â”€â”€ CategoryChip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface CategoryChipProps {
   category: ProjectCategory;
 }
+
+const categoryIcons: Record<ProjectCategory, React.ReactNode> = {
+  ROAD: <Route size={12} />,
+  BRIDGE: <Waves size={12} />,
+  BUILDING: <Building2 size={12} />,
+  WATER: <Droplets size={12} />,
+  SANITATION: <ShowerHead size={12} />,
+  ELECTRICITY: <Zap size={12} />,
+  RAILWAY: <TrainFront size={12} />,
+  METRO: <TrainFront size={12} />,
+  PORT: <Anchor size={12} />,
+  AIRPORT: <Plane size={12} />,
+  OTHER: <Construction size={12} />,
+};
+
 export function CategoryChip({ category }: CategoryChipProps) {
   return (
     <span className="inline-flex items-center gap-1 text-xs text-slate-600 dark:text-slate-400 bg-slate-900/5 dark:bg-white/5 px-2 py-1 rounded-full border border-slate-900/10 dark:border-white/10">
-      {CATEGORY_ICONS[category]} {CATEGORY_LABELS[category]}
+      {categoryIcons[category]} {CATEGORY_LABELS[category]}
     </span>
   );
 }
 
-// â”€â”€ ProgressBar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface ProgressBarProps {
   value?: number;
   status: ProjectStatus;
@@ -80,8 +110,8 @@ export function ProgressBar({ value, status, label }: ProgressBarProps) {
     status === "COMPLETED"
       ? "progress-fill completed"
       : status === "DELAYED"
-      ? "progress-fill delayed"
-      : "progress-fill";
+        ? "progress-fill delayed"
+        : "progress-fill";
 
   return (
     <div className="space-y-1">
@@ -98,7 +128,6 @@ export function ProgressBar({ value, status, label }: ProgressBarProps) {
   );
 }
 
-// â”€â”€ BudgetDisplay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface BudgetDisplayProps {
   sanctioned?: number;
   revised?: number;
@@ -131,7 +160,6 @@ export function BudgetDisplay({ sanctioned, revised, expenditure }: BudgetDispla
   );
 }
 
-// â”€â”€ DelayChip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface DelayChipProps {
   delayDays?: number;
 }
@@ -146,7 +174,6 @@ export function DelayChip({ delayDays }: DelayChipProps) {
   );
 }
 
-// â”€â”€ InfoRow â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface InfoRowProps {
   label: string;
   value?: string | null;
@@ -157,19 +184,17 @@ export function InfoRow({ label, value, mono }: InfoRowProps) {
   return (
     <div className="flex justify-between items-start gap-4 py-2 border-b border-slate-900/5 dark:border-white/5">
       <span className="text-sm text-slate-600 dark:text-slate-500 shrink-0">{label}</span>
-      <span
-        className={`text-sm text-right text-slate-200 ${mono ? "font-mono" : ""}`}
-      >
-        {value ?? "â€”"}
+      <span className={`text-sm text-right text-slate-200 ${mono ? "font-mono" : ""}`}>
+        {value ?? "-"}
       </span>
     </div>
   );
 }
 
-// â”€â”€ Skeleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface SkeletonProps {
   className?: string;
 }
+
 export function Skeleton({ className = "" }: SkeletonProps) {
   return <div className={`skeleton ${className}`} />;
 }
