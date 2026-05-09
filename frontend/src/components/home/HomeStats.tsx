@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import useSWR from "swr";
-import { adminApi } from "@/lib/api";
+import { analyticsApi } from "@/lib/api";
 import { TrendingUp, Clock, CheckCircle, AlertTriangle } from "lucide-react";
 import { motion, useSpring, useTransform } from "framer-motion";
 
@@ -18,7 +18,8 @@ function Counter({ value }: { value: number }) {
 }
 
 export function HomeStats() {
-  const { data: stats, isLoading } = useSWR("public-stats", () => adminApi.stats().then(r => r.data));
+  const { data, isLoading } = useSWR("public-stats", () => analyticsApi.summary().then(r => r.data));
+  const stats = data?.totals;
 
   const displayStats = [
     { label: "Total Projects", value: stats?.total_projects ?? 0, color: "text-brand-400", icon: <TrendingUp size={18} /> },

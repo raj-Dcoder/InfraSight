@@ -5,8 +5,9 @@ GET /search?q=...&state=...&bbox=...
 GET /search/map   - lightweight geo-only response for map pins
 GET /search/suggest - autocomplete suggestions
 """
-from typing import Optional, List
+from typing import Optional
 from uuid import UUID
+from datetime import date
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,6 +19,25 @@ from app.models.project import Project, ProjectCategory, ProjectStatus, Verifica
 from app.schemas.schemas import ProjectListItem, PaginatedResponse
 
 router = APIRouter()
+
+
+SORT_COLUMNS = {
+    "created_at": Project.created_at,
+    "updated_at": Project.updated_at,
+    "title": Project.title,
+    "sanctioned_budget_inr": Project.sanctioned_budget_inr,
+    "physical_progress_pct": Project.physical_progress_pct,
+}
+
+
+def _compute_delay_days(project: Project) -> Optional[int]:
+    end = project.revised_end_date or project.original_end_date
+    if not end or project.status == ProjectStatus.COMPLETED:
+        return None
+    today = date.today()
+    if today > end:
+        return (today - end).days
+    return 0
 
 
 @router.get("", response_model=PaginatedResponse)
@@ -40,6 +60,8 @@ async def search_projects(
     radius_km: float = Query(10.0, description="Radius in km for Near Me search"),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
+    sort_by: str = Query("created_at"),
+    sort_dir: str = Query("desc", pattern="^(asc|desc)$"),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -48,7 +70,6 @@ async def search_projects(
     - Geo bounding box filter (PostGIS)
     - Faceted filters
     """
-    from datetime import date
     from sqlalchemy.orm import selectinload
 
     filters = []
@@ -114,8 +135,8 @@ async def search_projects(
     # Count
     total = (await db.execute(select(func.count(Project.id)).where(where))).scalar_one()
 
-    # Rank by FTS relevance if q present
-    if q:
+    # Rank by FTS relevance for plain text searches unless the caller chose a sort.
+    if q and sort_by == "relevance":
         ts_query = func.plainto_tsquery("english", q)
         ts_vector = func.to_tsvector(
             "english",
@@ -123,7 +144,8 @@ async def search_projects(
         )
         order = func.ts_rank(ts_vector, ts_query).desc()
     else:
-        order = Project.created_at.desc()
+        sort_col = SORT_COLUMNS.get(sort_by, Project.created_at)
+        order = sort_col.desc() if sort_dir == "desc" else sort_col.asc()
 
     from sqlalchemy.orm import selectinload
     rows = (await db.execute(
@@ -153,6 +175,7 @@ async def search_projects(
             authority_name=p.authority.canonical_name if p.authority else None,
             lat=lat,
             lng=lng,
+            delay_days=_compute_delay_days(p),
             created_at=p.created_at,
         ))
 
@@ -165,7 +188,11 @@ async def search_projects(
 @router.get("/map")
 async def map_pins(
     state: Optional[str] = Query(None),
+    city: Optional[str] = Query(None),
     category: Optional[ProjectCategory] = Query(None),
+    status: Optional[ProjectStatus] = Query(None),
+    verification_status: Optional[VerificationStatus] = Query(None),
+    delayed_only: bool = Query(False),
     near_lat: Optional[float] = Query(None),
     near_lng: Optional[float] = Query(None),
     radius_km: float = Query(10.0),
@@ -179,8 +206,25 @@ async def map_pins(
     filters = [Project.location.isnot(None)]
     if state:
         filters.append(Project.state.ilike(f"%{state}%"))
+    if city:
+        filters.append(Project.city.ilike(f"%{city}%"))
     if category:
         filters.append(Project.category == category)
+    if status:
+        filters.append(Project.status == status)
+    if verification_status:
+        filters.append(Project.verification_status == verification_status)
+    if delayed_only:
+        today = date.today()
+        filters.append(
+            and_(
+                Project.status != ProjectStatus.COMPLETED,
+                or_(
+                    Project.revised_end_date < today,
+                    and_(Project.revised_end_date.is_(None), Project.original_end_date < today),
+                ),
+            )
+        )
     if near_lat is not None and near_lng is not None:
         from geoalchemy2.types import Geography
         from geoalchemy2.functions import ST_MakePoint, ST_SetSRID

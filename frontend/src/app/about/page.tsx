@@ -22,12 +22,12 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative text-center">
           <motion.div {...fadeIn} transition={{ duration: 0.6 }}>
             <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-900 dark:text-white mb-6">
-              Empowering Citizens with <br />
-              <span className="text-brand-400">Public Accountability</span>
+              Helping Citizens Track <br />
+              <span className="text-brand-400">Public Works</span>
             </h1>
             <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-              InfraSight is an open-source platform dedicated to tracking government infrastructure 
-              projects and ensuring that every rupee of tax money is accounted for.
+              InfraSight is an open-source platform for collecting infrastructure records, source links,
+              documents, and citizen reports into one easier-to-review public view.
             </p>
           </motion.div>
         </div>
@@ -46,23 +46,23 @@ export default function AboutPage() {
                 making it difficult for the average citizen to understand what's happening in their neighborhood.
               </p>
               <p>
-                InfraSight aggregates this data into a single, transparent, and interactive platform. 
-                We believe that transparency leads to better governance and higher quality public works.
+                InfraSight brings available records into a single, interactive platform. We believe clearer
+                public information can help citizens, journalists, and administrators ask better questions.
               </p>
             </div>
           </motion.div>
           <motion.div {...fadeIn} className="grid grid-cols-2 gap-4">
             <div className="glass-card p-6 text-center">
-              <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">100%</div>
-              <div className="text-xs text-slate-600 dark:text-slate-500 uppercase tracking-wider">Transparent</div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">Source</div>
+              <div className="text-xs text-slate-600 dark:text-slate-500 uppercase tracking-wider">Linked</div>
             </div>
             <div className="glass-card p-6 text-center">
               <div className="text-3xl font-bold text-brand-400 mb-1">Open</div>
               <div className="text-xs text-slate-600 dark:text-slate-500 uppercase tracking-wider">Source</div>
             </div>
             <div className="glass-card p-6 text-center">
-              <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">Real</div>
-              <div className="text-xs text-slate-600 dark:text-slate-500 uppercase tracking-wider">Time Data</div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">Tracked</div>
+              <div className="text-xs text-slate-600 dark:text-slate-500 uppercase tracking-wider">Updates</div>
             </div>
             <div className="glass-card p-6 text-center">
               <div className="text-3xl font-bold text-purple-400 mb-1">Civic</div>
@@ -85,16 +85,16 @@ export default function AboutPage() {
               <Database className="text-brand-400 mb-6" size={32} />
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Data Ingestion</h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Automated scrapers crawl official government portals to collect the latest tender 
-                notices, work orders, and progress reports.
+                Scoped import tools collect tender notices, work orders, and progress records from connected
+                sources when those sources are available.
               </p>
             </div>
             <div className="glass-card p-8">
               <Eye className="text-purple-400 mb-6" size={32} />
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Verification</h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Every record is cross-referenced with satellite imagery, ground-level reports, 
-                and official audit documents to ensure accuracy.
+                Records can be reviewed against source links, uploaded documents, public reports, and admin
+                verification status. Unverified records remain clearly marked.
               </p>
             </div>
             <div className="glass-card p-8">

@@ -6,19 +6,22 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import {
-  StatusBadge, TrustBadge, CategoryChip, ProgressBar,
+  StatusBadge, CategoryChip, ProgressBar,
   DelayChip,
 } from "@/components/ui/Badges";
 import { projectsApi } from "@/lib/api";
 import type { ProjectDetail, Complaint, Document as ProjectDocument } from "@/types";
-import { formatINR, formatDate, CATEGORY_ICONS } from "@/lib/utils";
+import { formatINR, formatDate } from "@/lib/utils";
 import {
-  ArrowLeft, MapPin, Calendar, HardHat, Building2, ExternalLink,
-  MessageSquare, FileText, Clock, AlertTriangle, CheckCircle,
-  Users, IndianRupee, TrendingUp, Shield, Activity, Cpu, Image,
-  ThumbsUp, Send, Globe, Phone, Mail, BadgeCheck, XCircle, Edit3
+  ArrowLeft, MapPin, Calendar, ExternalLink,
+  MessageSquare, Clock, AlertTriangle, CheckCircle,
+  Users, IndianRupee, Activity, Cpu, Image,
+  Send, BadgeCheck, XCircle, Edit3
 } from "lucide-react";
 import { ProjectEditModal } from "@/components/admin/ProjectEditModal";
+import { ProjectComplaintForm } from "@/components/projects/ProjectComplaintForm";
+import { ProjectDetailSkeleton } from "@/components/projects/ProjectDetailSkeleton";
+import { ProjectEvidencePanel } from "@/components/projects/ProjectEvidencePanel";
 
 interface Props { params: { id: string } }
 
@@ -72,7 +75,7 @@ export default function ProjectDetailPage({ params }: Props) {
         </div>
 
         {isLoading ? (
-          <Skeleton />
+          <ProjectDetailSkeleton />
         ) : project ? (
           <div className="space-y-6 animate-fade-in">
 
@@ -102,6 +105,8 @@ export default function ProjectDetailPage({ params }: Props) {
                 </div>
               </div>
             </div>
+
+            <ProjectEvidencePanel project={project} documents={documents} />
 
             {/* 2. LOCATION DETAILS */}
             <div className="glass-card p-6">
@@ -140,19 +145,26 @@ export default function ProjectDetailPage({ params }: Props) {
               </div>
             </div>
 
-            {/* 3. RESPONSIBILITY (CORE FEATURE ⭐) */}
-            <div className="glass-card p-6 border-2 border-brand-500/50 shadow-[0_0_20px_rgba(56,189,248,0.15)] relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-brand-500/20 text-brand-300 text-[10px] font-bold px-3 py-1 uppercase tracking-widest rounded-bl-lg border-b border-l border-brand-500/30">
-                Core Feature
-              </div>
+            {/* 3. RESPONSIBILITY */}
+            <div className="glass-card p-6 border-2 border-brand-500/40 shadow-[0_0_20px_rgba(56,189,248,0.12)] relative overflow-hidden">
               <h2 className="font-semibold text-brand-100 text-base uppercase tracking-widest flex items-center gap-2 mb-6">
-                <Users size={18} className="text-brand-400" /> Responsibility ⭐
+                <Users size={18} className="text-brand-400" /> Responsibility
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {/* Executing Authority */}
                 <div className="bg-white/5 border border-white/10 rounded-xl p-5">
                   <div className="text-xs text-slate-400 mb-1">Executing Authority</div>
-                  <div className="font-bold text-white text-lg mb-3">{project.authority?.canonical_name || "Not assigned"}</div>
+                  {project.authority ? (
+                    <Link
+                      href={`/authorities/${project.authority.id}`}
+                      className="font-bold text-white text-lg mb-3 inline-flex items-center gap-2 hover:text-brand-300 transition-colors"
+                    >
+                      {project.authority.canonical_name}
+                      <ExternalLink size={13} className="opacity-60" />
+                    </Link>
+                  ) : (
+                    <div className="font-bold text-white text-lg mb-3">Not assigned</div>
+                  )}
                   <div className="space-y-2">
                     <InfoRow label="Department" value={project.authority?.authority_type || "N/A"} />
                     <InfoRow label="Officer Name" value={project.authority?.nodal_officer || "N/A"} />
@@ -161,7 +173,17 @@ export default function ProjectDetailPage({ params }: Props) {
                 {/* Contractor */}
                 <div className="bg-white/5 border border-white/10 rounded-xl p-5">
                   <div className="text-xs text-slate-400 mb-1">Contractor Details</div>
-                  <div className="font-bold text-white text-lg mb-3">{project.contractor?.canonical_name || "Not awarded"}</div>
+                  {project.contractor ? (
+                    <Link
+                      href={`/contractors/${project.contractor.id}`}
+                      className="font-bold text-white text-lg mb-3 inline-flex items-center gap-2 hover:text-brand-300 transition-colors"
+                    >
+                      {project.contractor.canonical_name}
+                      <ExternalLink size={13} className="opacity-60" />
+                    </Link>
+                  ) : (
+                    <div className="font-bold text-white text-lg mb-3">Not awarded</div>
+                  )}
                   <div className="space-y-2">
                     <InfoRow label="Contractor ID" value={project.contractor?.registration_number || "N/A"} mono />
                     {project.contractor?.blacklisted && (
@@ -183,7 +205,7 @@ export default function ProjectDetailPage({ params }: Props) {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-slate-500 font-mono">USP: 100% Transparency</span>
+                  <span className="text-[10px] text-slate-500 font-mono">Responsibility record</span>
                   <BadgeCheck className={project.consultant_name ? "text-brand-400" : "text-slate-500"} size={20} />
                 </div>
               </div>
@@ -274,76 +296,6 @@ export default function ProjectDetailPage({ params }: Props) {
               </div>
             </div>
 
-            {/* 7. DOCUMENTS & SOURCES (TRUST LAYER 🔥) */}
-            <div className="glass-card p-6 border border-green-500/30 bg-gradient-to-br from-green-900/10 to-transparent">
-              <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
-                <h2 className="font-semibold text-green-400 text-sm uppercase tracking-widest flex items-center gap-2">
-                  <Shield size={16} /> Documents & Sources 🔥
-                </h2>
-                <TrustBadge status={project.verification_status} />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <div className="text-xs text-slate-400 mb-3">Project Source URL</div>
-                  <div className="space-y-2">
-                    {project.source_url ? (
-                      <div className="space-y-2">
-                        <a 
-                          href={project.source_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 bg-blue-400/10 p-3 rounded-lg border border-blue-400/20 transition-all hover:scale-[1.01]"
-                        >
-                          <Globe size={14} /> 
-                          <span className="truncate flex-1">
-                            {new URL(project.source_url).hostname}
-                          </span>
-                          <ExternalLink size={12} className="shrink-0 opacity-50" />
-                        </a>
-                        <p className="text-[10px] text-slate-500 px-1">
-                          Official source of this project information. Verified by InfraSight.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="text-sm text-slate-500 italic bg-white/5 p-3 rounded-lg border border-white/5 flex items-center gap-2">
-                        <Globe size={14} className="opacity-30" />
-                        No source link available
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xs text-slate-400 mb-3">Project Documents</div>
-                  <div className="space-y-2">
-                    {documents.length > 0 ? (
-                      documents.map((doc) => (
-                        <a 
-                          key={doc.id}
-                          href={doc.file_url || doc.original_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-slate-300 bg-white/5 p-3 rounded-lg border border-white/5 hover:border-white/20 transition-all hover:bg-white/10 group"
-                        >
-                          <FileText size={14} className={doc.document_type === 'TENDER' ? 'text-red-400' : 'text-blue-400'} />
-                          <span className="truncate flex-1">{doc.title}</span>
-                          <span className="text-[10px] text-slate-500 group-hover:text-slate-400">
-                            {doc.file_size_bytes ? `${(doc.file_size_bytes / 1024).toFixed(0)} KB` : 'PDF'}
-                          </span>
-                        </a>
-                      ))
-                    ) : (
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-slate-300 bg-white/5 p-3 rounded-lg border border-white/5 opacity-50">
-                          <FileText size={14} className="text-slate-500" /> 
-                          <span className="flex-1 italic">No documents uploaded yet</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* 8. PUBLIC REPORTS / COMPLAINTS */}
             <div className="glass-card p-6">
               <div className="flex items-center justify-between mb-5">
@@ -364,13 +316,28 @@ export default function ProjectDetailPage({ params }: Props) {
                           <div className="text-sm font-semibold text-white">{c.title}</div>
                           <div className="text-xs text-slate-500">User ID: Anonymized • {formatDate(c.created_at)}</div>
                         </div>
-                        <span className={`text-[10px] uppercase px-2 py-0.5 rounded font-bold ${c.status === 'OPEN' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
-                          {c.status || 'OPEN'}
+                        <span className={`text-[10px] uppercase px-2 py-0.5 rounded font-bold ${c.status === 'SUBMITTED' || c.status === 'UNDER_REVIEW' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                          {(c.status || 'SUBMITTED').replace("_", " ")}
                         </span>
                       </div>
                       <p className="text-sm text-slate-300 mb-3">{c.description}</p>
-                      <div className="flex items-center gap-2 text-xs text-slate-500">
-                         <Image size={12} /> No Image Uploaded
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                        <Image size={12} />
+                        {c.evidence_urls?.length ? (
+                          c.evidence_urls.map((url, index) => (
+                            <a
+                              key={url}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-400 hover:text-blue-300 underline-offset-2 hover:underline"
+                            >
+                              Evidence {index + 1}
+                            </a>
+                          ))
+                        ) : (
+                          <span>No evidence attached</span>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -384,7 +351,13 @@ export default function ProjectDetailPage({ params }: Props) {
               <button onClick={() => setComplaintOpen(!complaintOpen)} className="btn-primary w-full py-2.5 text-sm flex items-center justify-center gap-2">
                 <Send size={14} /> File a New Report
               </button>
-              {complaintOpen && <ComplaintForm projectId={project.id} onClose={() => setComplaintOpen(false)} />}
+              {complaintOpen && (
+                <ProjectComplaintForm
+                  projectId={project.id}
+                  onClose={() => setComplaintOpen(false)}
+                  onSubmitted={() => mutate()}
+                />
+              )}
             </div>
 
             {/* 9. PROJECT UPDATES / HISTORY */}
@@ -409,58 +382,77 @@ export default function ProjectDetailPage({ params }: Props) {
               )}
             </div>
 
-            {/* 10. ACCOUNTABILITY SCORE (Advanced) */}
+            {/* 10. ACCOUNTABILITY SIGNALS */}
             <div className="glass-card p-6 bg-gradient-to-r from-brand-900/20 to-purple-900/20 border-purple-500/20">
               <div className="flex flex-col sm:flex-row gap-6 items-center">
                 <div className="flex-1">
                   <h2 className="font-semibold text-white text-sm uppercase tracking-widest flex items-center gap-2 mb-2">
-                    <BadgeCheck size={16} className="text-purple-400" /> Accountability Score
+                    <BadgeCheck size={16} className="text-purple-400" /> Accountability Signals
                   </h2>
-                  <p className="text-xs text-slate-400">Based on delay, complaints, budget overrun, and update frequency.</p>
+                  <p className="text-xs text-slate-400">A quick read of available delay, complaint, budget, and update signals. This is not an audit finding.</p>
                   <div className="mt-4 grid grid-cols-2 gap-3 text-xs text-slate-300">
-                    <div className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-400"/> Low Delays</div>
-                    <div className="flex items-center gap-1.5"><AlertTriangle size={12} className="text-yellow-400"/> Moderate Complaints</div>
-                    <div className="flex items-center gap-1.5"><CheckCircle size={12} className="text-green-400"/> On Budget</div>
-                    <div className="flex items-center gap-1.5"><XCircle size={12} className="text-red-400"/> Rare Updates</div>
+                    <div className="flex items-center gap-1.5">
+                      {project.delay_days && project.delay_days > 0 ? <AlertTriangle size={12} className="text-yellow-400"/> : <CheckCircle size={12} className="text-green-400"/>}
+                      {project.delay_days && project.delay_days > 0 ? "Delay reported" : "No active delay flag"}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {project.complaint_count > 0 ? <AlertTriangle size={12} className="text-yellow-400"/> : <CheckCircle size={12} className="text-green-400"/>}
+                      {project.complaint_count > 0 ? `${project.complaint_count} public reports` : "No public reports"}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {project.financial_progress_pct != null ? <CheckCircle size={12} className="text-green-400"/> : <XCircle size={12} className="text-slate-500"/>}
+                      {project.financial_progress_pct != null ? "Financial progress recorded" : "Spend data missing"}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {updates.length > 0 ? <CheckCircle size={12} className="text-green-400"/> : <XCircle size={12} className="text-slate-500"/>}
+                      {updates.length > 0 ? "Updates available" : "No update history"}
+                    </div>
                   </div>
                 </div>
                 <div className="w-24 h-24 rounded-full border-4 border-purple-500/30 flex items-center justify-center relative shrink-0">
                   <div className="absolute inset-0 rounded-full border-4 border-purple-400 border-t-transparent border-r-transparent rotate-45"></div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{project.accountability_score ?? "72"}</div>
+                    <div className="text-2xl font-bold text-white">{project.accountability_score ?? "N/A"}</div>
                     <div className="text-[10px] text-purple-300 uppercase">
-                      {project.accountability_score && project.accountability_score > 80 ? "Excellent" : 
-                       project.accountability_score && project.accountability_score > 60 ? "Fair" : "Poor"}
+                      {project.accountability_score == null ? "Needs Review" :
+                       project.accountability_score > 80 ? "Strong" :
+                       project.accountability_score > 60 ? "Mixed" : "Weak"}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* 11. AI INSIGHTS (Future Feature) */}
+            {/* 11. EXPERIMENTAL INSIGHTS */}
             <div className="glass-card p-6 border border-white/5 border-dashed bg-black/20">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="font-semibold text-white text-sm uppercase tracking-widest flex items-center gap-2">
-                  <Cpu size={16} className="text-indigo-400" /> AI Insights
+                  <Cpu size={16} className="text-indigo-400" /> Experimental Insights
                 </h2>
                 {!project.ai_insights && (
-                  <span className="text-[10px] uppercase font-bold bg-indigo-500/20 text-indigo-300 px-2 py-1 rounded">Coming Soon</span>
+                  <span className="text-[10px] uppercase font-bold bg-indigo-500/20 text-indigo-300 px-2 py-1 rounded">Not Available</span>
                 )}
               </div>
-              <div className={`grid grid-cols-1 sm:grid-cols-3 gap-4 ${!project.ai_insights ? 'opacity-50 select-none' : ''}`}>
-                <div className="bg-white/5 p-4 rounded-lg border border-white/5">
-                  <div className="text-xs font-semibold text-white mb-1">Risk Prediction</div>
-                  <div className="text-sm text-slate-400">{project.ai_insights?.risk_prediction || "Medium Risk"}</div>
+              {project.ai_insights ? (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="bg-white/5 p-4 rounded-lg border border-white/5">
+                    <div className="text-xs font-semibold text-white mb-1">Risk Note</div>
+                    <div className="text-sm text-slate-400">{project.ai_insights.risk_prediction || "No risk note recorded"}</div>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-lg border border-white/5">
+                    <div className="text-xs font-semibold text-white mb-1">Delay Note</div>
+                    <div className="text-sm text-slate-400">{project.ai_insights.delay_probability || "No delay note recorded"}</div>
+                  </div>
+                  <div className="bg-white/5 p-4 rounded-lg border border-white/5">
+                    <div className="text-xs font-semibold text-white mb-1">Quality Note</div>
+                    <div className="text-sm text-slate-400">{project.ai_insights.quality_issues || "No quality note recorded"}</div>
+                  </div>
                 </div>
-                <div className="bg-white/5 p-4 rounded-lg border border-white/5">
-                  <div className="text-xs font-semibold text-white mb-1">Delay Probability</div>
-                  <div className="text-sm text-slate-400">{project.ai_insights?.delay_probability || "45% Chance"}</div>
-                </div>
-                <div className="bg-white/5 p-4 rounded-lg border border-white/5">
-                  <div className="text-xs font-semibold text-white mb-1">Quality Issues</div>
-                  <div className="text-sm text-slate-400">{project.ai_insights?.quality_issues || "No anomalies detected"}</div>
-                </div>
-              </div>
+              ) : (
+                <p className="text-sm text-slate-400">
+                  No automated analysis is attached to this record yet. Use the source links, documents, updates, and public reports above for review.
+                </p>
+              )}
             </div>
           </div>
         ) : null}
@@ -488,55 +480,3 @@ function InfoRow({ label, value, mono }: { label: string; value: string; mono?: 
     </div>
   );
 }
-
-function ComplaintForm({ projectId, onClose }: { projectId: string; onClose: () => void }) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [type, setType] = useState("DELAY");
-  const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); setSubmitting(true);
-    try {
-      const { complaintsApi } = await import("@/lib/api");
-      await complaintsApi.submit({ project_id: projectId, title, description, complaint_type: type });
-      setDone(true);
-    } finally { setSubmitting(false); }
-  };
-  if (done) return (
-    <div className="mt-4 p-4 bg-green-900/20 border border-green-800/30 rounded-lg text-green-400 text-sm flex items-center gap-2">
-      <CheckCircle size={16} /> Complaint submitted. Thank you!
-    </div>
-  );
-  return (
-    <form onSubmit={handleSubmit} className="mt-5 space-y-4 border-t border-white/8 pt-5 animate-fade-in">
-      <h3 className="text-sm font-semibold text-white flex items-center gap-2"><Send size={13} className="text-brand-400" /> Submit a Complaint</h3>
-      <select value={type} onChange={(e) => setType(e.target.value)} className="input-dark text-sm w-full">
-        <option value="DELAY">Delay in work</option>
-        <option value="QUALITY">Poor quality / shoddy work</option>
-        <option value="CORRUPTION">Corruption / misuse of funds</option>
-        <option value="SAFETY">Safety hazard</option>
-        <option value="MISMATCH">Data mismatch</option>
-        <option value="OTHER">Other</option>
-      </select>
-      <input required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Brief issue title…" className="input-dark text-sm w-full" />
-      <textarea required value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe what you observed…" className="input-dark text-sm resize-none w-full" rows={3} />
-      <div className="flex gap-2">
-        <button type="submit" disabled={submitting} className="btn-primary text-sm py-2 flex-1 justify-center">{submitting ? "Submitting…" : "Submit Complaint"}</button>
-        <button type="button" onClick={onClose} className="btn-ghost text-sm py-2 px-4">Cancel</button>
-      </div>
-    </form>
-  );
-}
-
-function Skeleton() {
-  return (
-    <div className="space-y-6 animate-pulse">
-      <div className="glass-card p-8 h-48" />
-      <div className="glass-card p-6 h-64" />
-      <div className="glass-card p-6 h-72" />
-      <div className="glass-card p-6 h-32" />
-    </div>
-  );
-}
-

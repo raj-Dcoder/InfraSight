@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { ComplaintStatus, VerificationStatus } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -60,12 +61,29 @@ export const searchApi = {
     api.get("/search/suggest", { params: { q } }),
 };
 
+export const analyticsApi = {
+  summary: () => api.get("/analytics/summary"),
+};
+
 export const complaintsApi = {
   submit: (data: Record<string, unknown>) =>
     api.post("/complaints", data),
 
+  uploadEvidence: (id: string, data: FormData) =>
+    api.post(`/complaints/${id}/evidence`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
+
   upvote: (id: string) =>
     api.post(`/complaints/${id}/upvote`),
+};
+
+export const partiesApi = {
+  contractor: (id: string) =>
+    api.get(`/contractors/${id}`),
+
+  authority: (id: string) =>
+    api.get(`/authorities/${id}`),
 };
 
 export const authApi = {
@@ -84,8 +102,8 @@ export const adminApi = {
   unverifiedProjects: () => api.get("/admin/projects/unverified"),
   runIngestion: (data: Record<string, unknown>) =>
     api.post("/admin/ingest/run-now", data, { timeout: 120000 }),
-  verifyProject: (id: string, status: string) => 
+  verifyProject: (id: string, status: VerificationStatus) => 
     api.patch(`/projects/${id}/verify?verification_status=${status}`),
-  moderateComplaint: (id: string, status: string) =>
+  moderateComplaint: (id: string, status: ComplaintStatus) =>
     api.patch(`/complaints/${id}/moderate?new_status=${status}`),
 };

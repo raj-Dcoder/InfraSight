@@ -7,7 +7,7 @@ from sqlalchemy import (
     Date, SmallInteger, ForeignKey, ARRAY, Integer,
     Enum as SAEnum
 )
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.dialects.postgresql import UUID, JSONB, INET
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from geoalchemy2 import Geometry
@@ -259,7 +259,7 @@ class Complaint(Base):
     moderation_notes = Column(Text)
     evidence_urls = Column(ARRAY(Text), default=[])
     location = Column(Geometry("POINT", srid=4326))
-    ip_address = Column(Text)
+    ip_address = Column(INET)
     user_agent = Column(Text)
     is_spam = Column(Boolean, default=False)
     spam_score = Column(Numeric(4, 2), default=0)

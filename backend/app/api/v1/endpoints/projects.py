@@ -42,6 +42,14 @@ import structlog
 logger = structlog.get_logger()
 router = APIRouter()
 
+SORT_COLUMNS = {
+    "created_at": Project.created_at,
+    "updated_at": Project.updated_at,
+    "title": Project.title,
+    "sanctioned_budget_inr": Project.sanctioned_budget_inr,
+    "physical_progress_pct": Project.physical_progress_pct,
+}
+
 
 def _safe_upload_name(filename: str) -> str:
     suffix = Path(filename).suffix.lower()
@@ -93,6 +101,8 @@ async def list_projects(
     category: Optional[ProjectCategory] = Query(None),
     status_filter: Optional[ProjectStatus] = Query(None, alias="status"),
     verification_status: Optional[VerificationStatus] = Query(None),
+    min_budget: Optional[float] = Query(None),
+    max_budget: Optional[float] = Query(None),
     contractor_id: Optional[UUID] = Query(None),
     authority_id: Optional[UUID] = Query(None),
     delayed_only: bool = Query(False),
@@ -117,6 +127,10 @@ async def list_projects(
         filters.append(Project.status == status_filter)
     if verification_status:
         filters.append(Project.verification_status == verification_status)
+    if min_budget is not None:
+        filters.append(Project.sanctioned_budget_inr >= min_budget)
+    if max_budget is not None:
+        filters.append(Project.sanctioned_budget_inr <= max_budget)
     if contractor_id:
         filters.append(Project.contractor_id == contractor_id)
     if authority_id:
@@ -138,7 +152,7 @@ async def list_projects(
     total = (await db.execute(count_q)).scalar_one()
 
     # Sort
-    sort_col = getattr(Project, sort_by, Project.created_at)
+    sort_col = SORT_COLUMNS.get(sort_by, Project.created_at)
     order = sort_col.desc() if sort_dir == "desc" else sort_col.asc()
 
     # Query with eager loads

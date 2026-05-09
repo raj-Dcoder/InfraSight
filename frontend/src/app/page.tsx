@@ -17,7 +17,7 @@ const HOW_STEPS = [
   {
     icon: <FileSearch size={22} className="text-brand-400" />,
     title: "Search any project",
-    desc: "Type the name of a road, bridge, flyover, hospital, or drain near you. Get instant results with verified government data.",
+    desc: "Type the name of a road, bridge, flyover, hospital, or drain near you. See matching records with source and verification context.",
     step: "01",
     color: "brand",
   },
@@ -30,15 +30,15 @@ const HOW_STEPS = [
   },
   {
     icon: <Shield size={22} className="text-green-400" />,
-    title: "Trust the data",
-    desc: "Every record is tagged with its source and verification status. Community-verified, government-verified, or disputed - you'll always know.",
+    title: "Check the evidence",
+    desc: "Records are tagged with source links, documents, and verification status so you can judge how strong the evidence is.",
     step: "03",
     color: "green",
   },
   {
     icon: <AlertTriangle size={22} className="text-yellow-400" />,
     title: "Report an issue",
-    desc: "See poor quality work, corruption, or a delay? Submit a complaint directly on the project page. Every report is timestamped and public.",
+    desc: "See poor quality work, suspected misuse, or a delay? Submit a report directly on the project page with optional evidence.",
     step: "04",
     color: "yellow",
   },
@@ -134,9 +134,9 @@ export default function HomePage() {
               variants={fadeIn}
               className="font-display text-4xl sm:text-6xl font-extrabold text-slate-900 dark:text-white leading-tight mb-5"
             >
-              Know exactly where your{" "}
+              See where public{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-cyan-400">
-                tax money
+                infrastructure money
               </span>{" "}
               is going.
             </motion.h1>
@@ -145,8 +145,8 @@ export default function HomePage() {
               variants={fadeIn}
               className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed mb-10 max-w-2xl"
             >
-              Search any road, bridge, flyover, or public building near you. See who built it, how much was allocated, 
-              how much has been spent, and whether it's delayed - all from verified government data.
+              Search roads, bridges, flyovers, and public buildings near you. Compare budgets, contractors,
+              timelines, source links, and public reports in one place.
             </motion.p>
 
             <motion.div variants={fadeIn}>
@@ -177,7 +177,7 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-brand-400" />
-                Data updated daily
+                Source-backed records
               </div>
             </motion.div>
           </motion.div>
@@ -230,7 +230,7 @@ export default function HomePage() {
           >
             <h2 className="font-display text-3xl font-bold text-slate-900 dark:text-white mb-3">How InfraSight Works</h2>
             <p className="text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
-              From raw government data to a single transparent view - in four simple steps.
+              From scattered public records to a clearer civic view - in four simple steps.
             </p>
           </motion.div>
           <motion.div 
@@ -289,7 +289,7 @@ export default function HomePage() {
             {
               icon: <HardHat size={24} className="text-yellow-400" />,
               title: "Watchdog Organizations",
-              desc: "Track project delays, cost overruns, and blacklisted contractors across districts and states.",
+              desc: "Track delays, budget changes, complaint patterns, and contractor records across available datasets.",
             },
           ].map((u) => (
             <motion.div key={u.title} variants={fadeIn} className="glass-card p-7 hover:bg-slate-900/5 dark:hover:bg-white/5 transition-colors">
@@ -331,7 +331,7 @@ export default function HomePage() {
       </section>
 
       <footer className="border-t border-slate-900/8 dark:border-white/8 py-8 text-center text-sm text-slate-600">
-        InfraSight - Built for public accountability &bull; Phase 1: Bhubaneswar &bull; Data sourced from official government portals
+        InfraSight - Built for public oversight &bull; Phase 1: Bhubaneswar &bull; Records include official and community-submitted evidence
       </footer>
     </div>
   );

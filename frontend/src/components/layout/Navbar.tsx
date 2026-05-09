@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { MapPin, Search, Menu, X, Activity, LogOut, Shield } from "lucide-react";
+import { BarChart3, MapPin, Search, Menu, X, Activity, LogOut, Shield } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -51,6 +51,10 @@ export function Navbar() {
             <Link href="/map" className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1.5">
               <MapPin size={14} />
               Map
+            </Link>
+            <Link href="/analytics" className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1.5">
+              <BarChart3 size={14} />
+              Analytics
             </Link>
             <Link href="/about" className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
               About
@@ -116,6 +120,7 @@ export function Navbar() {
           </form>
           <Link href="/projects" className="block text-slate-700 dark:text-slate-300 py-2" onClick={() => setMobileOpen(false)}>Projects</Link>
           <Link href="/map" className="block text-slate-700 dark:text-slate-300 py-2" onClick={() => setMobileOpen(false)}>Map View</Link>
+          <Link href="/analytics" className="block text-slate-700 dark:text-slate-300 py-2" onClick={() => setMobileOpen(false)}>Analytics</Link>
           <Link href="/about" className="block text-slate-700 dark:text-slate-300 py-2" onClick={() => setMobileOpen(false)}>About</Link>
           {isLoggedIn ? (
             <>

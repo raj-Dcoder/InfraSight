@@ -27,6 +27,7 @@ import {
 import { formatDate } from "@/lib/utils";
 import { ProjectEditModal } from "@/components/admin/ProjectEditModal";
 import { projectsApi } from "@/lib/api";
+import type { ComplaintStatus, VerificationStatus } from "@/types";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<"stats" | "ingest" | "complaints" | "verify" | "manage">("stats");
@@ -65,21 +66,21 @@ export default function AdminDashboard() {
     () => projectsApi.list({ q: searchQuery, page_size: 50 }).then(r => r.data)
   );
 
-  const handleModerate = async (id: string, status: string) => {
+  const handleModerate = async (id: string, status: ComplaintStatus) => {
     try {
       await adminApi.moderateComplaint(id, status);
       mutate("admin-complaints");
-      toast.success(`Complaint marked as ${status.toLowerCase()}`);
+      toast.success(`Complaint marked as ${status.toLowerCase().replace("_", " ")}`);
     } catch (e) {
       toast.error("Failed to moderate complaint");
     }
   };
 
-  const handleVerify = async (id: string, status: string) => {
+  const handleVerify = async (id: string, status: VerificationStatus) => {
     try {
       await adminApi.verifyProject(id, status);
       mutate("admin-projects");
-      toast.success(`Project verification set to ${status.toLowerCase()}`);
+      toast.success(`Project verification set to ${status.toLowerCase().replace("_", " ")}`);
     } catch (e) {
       toast.error("Failed to verify project");
     }
@@ -334,16 +335,40 @@ export default function AdminDashboard() {
 
         {activeTab === "complaints" && (
           <div className="space-y-4 animate-fade-in">
+            <div className="rounded-lg border border-slate-900/10 dark:border-white/10 bg-slate-900/5 dark:bg-white/5 p-4">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Active complaint review</h2>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                Reports stay here while submitted, under review, or escalated. Resolving or rejecting closes them from this queue.
+              </p>
+            </div>
             {!complaints?.length ? (
-              <p className="text-slate-600 dark:text-slate-500">No pending complaints.</p>
+              <p className="text-slate-600 dark:text-slate-500">No active complaints to review.</p>
             ) : (
               complaints.map((c: any) => (
                 <div key={c.id} className="glass-card p-5 border-l-4 border-brand-500">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-slate-900 dark:text-white font-medium">{c.title}</h3>
-                    <div className="flex gap-2">
-                      <button onClick={() => handleModerate(c.id, "REVIEWED")} className="btn-ghost py-1 px-3 text-xs text-green-400 hover:bg-green-400/10 hover:border-green-400/30">
-                        <CheckCircle2 size={14} className="mr-1" inline /> Approve
+                  <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4 mb-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <h3 className="text-slate-900 dark:text-white font-medium">{c.title}</h3>
+                        <ComplaintStatusPill status={c.status} />
+                        {c.complaint_type && (
+                          <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-slate-900/5 dark:bg-white/5 text-slate-600 dark:text-slate-400">
+                            {c.complaint_type}
+                          </span>
+                        )}
+                      </div>
+                      <Link href={`/projects/${c.project_id}`} className="text-xs text-brand-400 hover:underline">
+                        {c.project_title || "View project"}
+                      </Link>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {c.status === "SUBMITTED" && (
+                        <button onClick={() => handleModerate(c.id, "UNDER_REVIEW")} className="btn-ghost py-1 px-3 text-xs text-blue-400 hover:bg-blue-400/10 hover:border-blue-400/30">
+                          <Clock size={14} className="mr-1" inline /> Start Review
+                        </button>
+                      )}
+                      <button onClick={() => handleModerate(c.id, "RESOLVED")} className="btn-ghost py-1 px-3 text-xs text-green-400 hover:bg-green-400/10 hover:border-green-400/30">
+                        <CheckCircle2 size={14} className="mr-1" inline /> Resolve
                       </button>
                       <button onClick={() => handleModerate(c.id, "REJECTED")} className="btn-ghost py-1 px-3 text-xs text-red-400 hover:bg-red-400/10 hover:border-red-400/30">
                         <Ban size={14} className="mr-1" inline /> Reject
@@ -351,8 +376,29 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                   <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">{c.description}</p>
-                  <div className="flex items-center gap-4 text-xs text-slate-600 dark:text-slate-500">
+                  <div className="mb-3 rounded-lg border border-slate-900/10 dark:border-white/10 bg-slate-900/5 dark:bg-white/5 p-3">
+                    <div className="text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">Evidence</div>
+                    {c.evidence_urls?.length ? (
+                      <div className="flex flex-wrap gap-2">
+                        {c.evidence_urls.map((url: string, index: number) => (
+                          <a
+                            key={url}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 border border-blue-400/20 bg-blue-400/10 rounded px-2 py-1"
+                          >
+                            <FileText size={12} /> Evidence {index + 1}
+                          </a>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-slate-600 dark:text-slate-500">No evidence file attached.</p>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 dark:text-slate-500">
                     <span className="flex items-center gap-1"><Clock size={12}/> {formatDate(c.created_at)}</span>
+                    {c.submitter_name && <span>Submitted by: {c.submitter_name}</span>}
                     {c.is_spam && <span className="text-red-400 bg-red-400/10 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Spam Detected (Score: {c.spam_score})</span>}
                   </div>
                 </div>
@@ -380,8 +426,8 @@ export default function AdminDashboard() {
                       <button onClick={() => handleVerify(p.id, "VERIFIED")} className="btn-ghost py-1 px-3 text-xs text-green-400 hover:bg-green-400/10 hover:border-green-400/30">
                         <CheckCircle2 size={14} className="mr-1" inline /> Verify Match
                       </button>
-                      <button onClick={() => handleVerify(p.id, "FLAGGED")} className="btn-ghost py-1 px-3 text-xs text-orange-400 hover:bg-orange-400/10 hover:border-orange-400/30">
-                        <AlertTriangle size={14} className="mr-1" inline /> Flag Mismatch
+                      <button onClick={() => handleVerify(p.id, "DISPUTED")} className="btn-ghost py-1 px-3 text-xs text-orange-400 hover:bg-orange-400/10 hover:border-orange-400/30">
+                        <AlertTriangle size={14} className="mr-1" inline /> Mark Disputed
                       </button>
                       <button onClick={() => handleEdit(p.id)} className="btn-ghost py-1 px-3 text-xs text-brand-400 hover:bg-brand-400/10 hover:border-brand-400/30">
                         <Edit3 size={14} className="mr-1" inline /> Edit
@@ -475,5 +521,19 @@ function ResultMetric({ label, value }: { label: string, value?: number }) {
       <p className="text-xs text-slate-600 dark:text-slate-400">{label}</p>
       <p className="text-xl font-semibold text-slate-900 dark:text-white">{value ?? 0}</p>
     </div>
+  );
+}
+
+function ComplaintStatusPill({ status }: { status: string }) {
+  const classes: Record<string, string> = {
+    SUBMITTED: "bg-yellow-500/15 text-yellow-500 border-yellow-500/20",
+    UNDER_REVIEW: "bg-blue-500/15 text-blue-400 border-blue-500/20",
+    ESCALATED: "bg-orange-500/15 text-orange-400 border-orange-500/20",
+  };
+
+  return (
+    <span className={`text-[10px] uppercase px-2 py-0.5 rounded border ${classes[status] || "bg-slate-500/10 text-slate-400 border-slate-500/20"}`}>
+      {status.replace("_", " ")}
+    </span>
   );
 }

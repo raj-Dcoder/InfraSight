@@ -29,6 +29,13 @@ export type VerificationStatus =
   | "DISPUTED"
   | "RETRACTED";
 
+export type ComplaintStatus =
+  | "SUBMITTED"
+  | "UNDER_REVIEW"
+  | "ESCALATED"
+  | "RESOLVED"
+  | "REJECTED";
+
 export interface Contractor {
   id: string;
   canonical_name: string;
@@ -134,7 +141,7 @@ export interface Complaint {
   title: string;
   description: string;
   complaint_type?: string;
-  status: string;
+  status: ComplaintStatus;
   evidence_urls: string[];
   upvotes: number;
   submitter_name?: string;
@@ -166,4 +173,43 @@ export interface Stats {
   completed_projects: number;
   total_complaints: number;
   by_category: Record<string, number>;
+}
+
+export interface AnalyticsSummary {
+  totals: {
+    total_projects: number;
+    verified_projects: number;
+    delayed_projects: number;
+    completed_projects: number;
+    total_complaints: number;
+    total_budget_inr: number;
+    total_spent_inr: number;
+    verification_rate: number;
+    delay_rate: number;
+  };
+  by_status: Array<{ status: ProjectStatus; count: number }>;
+  by_category: Array<{ category: ProjectCategory; count: number; budget_inr: number }>;
+  by_verification: Array<{ status: VerificationStatus; count: number }>;
+  by_city: Array<{ city: string; count: number; budget_inr: number }>;
+  attention_projects: ProjectListItem[];
+}
+
+export interface PartyStats {
+  total_projects: number;
+  delayed_projects: number;
+  completed_projects: number;
+  total_budget_inr: number;
+  total_complaints: number;
+}
+
+export interface ContractorProfile {
+  contractor: Contractor;
+  stats: PartyStats;
+  projects: ProjectListItem[];
+}
+
+export interface AuthorityProfile {
+  authority: Authority;
+  stats: PartyStats;
+  projects: ProjectListItem[];
 }

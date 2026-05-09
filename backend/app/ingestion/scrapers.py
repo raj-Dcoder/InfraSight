@@ -13,7 +13,7 @@ import hashlib
 import json
 from abc import ABC, abstractmethod
 from typing import Optional
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 import httpx
 from bs4 import BeautifulSoup
@@ -54,6 +54,15 @@ class BaseScraper(ABC):
         """Generate stable hash to detect duplicates."""
         key = json.dumps(data, sort_keys=True, default=str)
         return hashlib.sha256(key.encode()).hexdigest()
+
+    def _with_ingestion_metadata(self, raw_data: Optional[dict]) -> dict:
+        """Attach stable source metadata without losing original scraped fields."""
+        data = dict(raw_data or {})
+        data["_ingestion"] = {
+            "source_hash": self._source_hash(raw_data or {}),
+            "fetched_at": datetime.now(timezone.utc).isoformat(),
+        }
+        return data
 
     def _scope_value(self, key: str) -> Optional[str]:
         value = self.config.get(key)
@@ -157,7 +166,7 @@ class BaseScraper(ABC):
         physical_progress: Optional[int] = None,
         funding_source: Optional[str] = None,
     ) -> tuple[bool, bool]:
-        """Insert or skip project. Returns (inserted, updated)."""
+        """Insert or update a project. Returns (inserted, updated)."""
         from sqlalchemy import select
 
         # Check by source_document_id first
@@ -170,8 +179,62 @@ class BaseScraper(ABC):
                 )
             )).scalar_one_or_none()
 
+            if existing is None:
+                # Admin-created source rows can change over time. Treat the
+                # source document id as the stronger duplicate key so reruns do
+                # not create another public project for the same official record.
+                existing = (await db.execute(
+                    select(Project).where(Project.source_document_id == source_doc_id)
+                )).scalars().first()
+
         if existing:
-            return False, False  # Skip duplicate
+            changed = False
+            raw_with_meta = self._with_ingestion_metadata(raw_data)
+            source_hash = raw_with_meta["_ingestion"]["source_hash"]
+            old_hash = (existing.raw_data or {}).get("_ingestion", {}).get("source_hash")
+
+            # Keep human-verified facts stable; still preserve latest source payload
+            # so reviewers can compare official data against the verified record.
+            can_update_facts = existing.verification_status in (
+                VerificationStatus.UNVERIFIED,
+                VerificationStatus.DISPUTED,
+            )
+
+            if old_hash != source_hash:
+                existing.raw_data = raw_with_meta
+                changed = True
+
+            if source_url and existing.source_url != source_url:
+                existing.source_url = source_url
+                changed = True
+
+            if can_update_facts:
+                updates = {
+                    "title": title[:1000] if title else None,
+                    "description": description,
+                    "category": category,
+                    "status": status,
+                    "state": state,
+                    "city": city,
+                    "district": district,
+                    "sanctioned_budget_inr": sanctioned_budget,
+                    "start_date": start_date,
+                    "original_end_date": end_date,
+                    "physical_progress_pct": physical_progress,
+                    "funding_source": funding_source,
+                }
+                for field, value in updates.items():
+                    if value is not None and getattr(existing, field) != value:
+                        setattr(existing, field, value)
+                        changed = True
+
+                if existing.location is None and lat is not None and lng is not None:
+                    from geoalchemy2.shape import from_shape
+                    from shapely.geometry import Point
+                    existing.location = from_shape(Point(lng, lat), srid=4326)
+                    changed = True
+
+            return False, changed
 
         project = Project(
             title=title[:1000],
@@ -187,7 +250,7 @@ class BaseScraper(ABC):
             data_source_id=source.id,
             source_url=source_url,
             source_document_id=source_doc_id,
-            raw_data=raw_data or {},
+            raw_data=self._with_ingestion_metadata(raw_data),
             verification_status=VerificationStatus.UNVERIFIED,
             physical_progress_pct=physical_progress,
             funding_source=funding_source,
@@ -213,6 +276,8 @@ class PMGSYScraper(BaseScraper):
 
     async def run(self, source) -> dict:
         inserted = 0
+        updated = 0
+        skipped = 0
         found = 0
         requested_category = self._scope_value("category")
         if requested_category and requested_category != ProjectCategory.ROAD.value.lower():
@@ -253,6 +318,7 @@ class PMGSYScraper(BaseScraper):
                         "category": ProjectCategory.ROAD.value,
                     }
                     if not self._record_matches_scope(candidate):
+                        skipped += 1
                         continue
 
                     try:
@@ -260,7 +326,7 @@ class PMGSYScraper(BaseScraper):
                     except ValueError:
                         budget = None
 
-                    ok, _ = await self._upsert_project(
+                    was_inserted, was_updated = await self._upsert_project(
                         db=db,
                         source=source,
                         title=title or f"PMGSY Road Project {project_id}",
@@ -274,10 +340,15 @@ class PMGSYScraper(BaseScraper):
                         source_doc_id=f"pmgsy_{project_id}",
                         raw_data={c.get("data-field", f"col_{i}"): c.get_text(strip=True) for i, c in enumerate(cells)},
                     )
-                    if ok:
+                    if was_inserted:
                         inserted += 1
+                    elif was_updated:
+                        updated += 1
+                    else:
+                        skipped += 1
+                await db.commit()
 
-        return {"found": found, "inserted": inserted, "updated": 0}
+        return {"found": found, "inserted": inserted, "updated": updated, "skipped": skipped}
 
 
 class OdishaEProcScraper(BaseScraper):
@@ -288,6 +359,7 @@ class OdishaEProcScraper(BaseScraper):
 
     async def run(self, source) -> dict:
         inserted = 0
+        updated = 0
         found = 0
         skipped = 0
 
@@ -334,7 +406,7 @@ class OdishaEProcScraper(BaseScraper):
                     skipped += 1
                     continue
 
-                ok, _ = await self._upsert_project(
+                was_inserted, was_updated = await self._upsert_project(
                     db=db,
                     source=source,
                     title=title or f"Odisha PWD Tender {tender_id}",
@@ -347,10 +419,15 @@ class OdishaEProcScraper(BaseScraper):
                     source_doc_id=f"odisha_tender_{tender_id}",
                     raw_data={"tender_id": tender_id, "dept": dept},
                 )
-                if ok:
+                if was_inserted:
                     inserted += 1
+                elif was_updated:
+                    updated += 1
+                else:
+                    skipped += 1
+            await db.commit()
 
-        return {"found": found, "inserted": inserted, "updated": 0, "skipped": skipped}
+        return {"found": found, "inserted": inserted, "updated": updated, "skipped": skipped}
 
 
 class ManualDataScraper(BaseScraper):
@@ -365,6 +442,7 @@ class ManualDataScraper(BaseScraper):
 
         seed_dir = self.config.get("seed_dir", "/app/data/seed")
         inserted = 0
+        updated = 0
         found = 0
         skipped = 0
 
@@ -393,7 +471,7 @@ class ManualDataScraper(BaseScraper):
                             skipped += 1
                             continue
 
-                        ok, _ = await self._upsert_project(
+                        was_inserted, was_updated = await self._upsert_project(
                             db=db,
                             source=source,
                             title=record.get("title", "Untitled"),
@@ -412,15 +490,19 @@ class ManualDataScraper(BaseScraper):
                             physical_progress=record.get("physical_progress", record.get("physical_progress_pct")),
                             funding_source=record.get("funding_source"),
                         )
-                        if ok:
+                        if was_inserted:
                             inserted += 1
+                        elif was_updated:
+                            updated += 1
+                        else:
+                            skipped += 1
                     except Exception as e:
                         await db.rollback()
                         print(f"Failed to upsert record {record.get('id')}: {e}")
                 await db.commit()
-            print(f"Finished processing {fname}. Inserted: {inserted}")
+            print(f"Finished processing {fname}. Inserted: {inserted}, Updated: {updated}, Skipped: {skipped}")
 
-        return {"found": found, "inserted": inserted, "updated": 0, "skipped": skipped}
+        return {"found": found, "inserted": inserted, "updated": updated, "skipped": skipped}
 
 
 def get_scraper(source_type: str, config: dict) -> BaseScraper:

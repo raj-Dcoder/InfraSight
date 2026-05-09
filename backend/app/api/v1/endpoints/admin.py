@@ -7,7 +7,7 @@ from sqlalchemy import select, func
 
 from app.core.database import get_db
 from app.core.auth import require_admin
-from app.models.project import Project, Complaint, ProjectStatus, VerificationStatus, DataSource, DataSourceType
+from app.models.project import Project, Complaint, ProjectStatus, VerificationStatus, DataSource, DataSourceType, ComplaintStatus
 from app.models.user import User
 from app.schemas.schemas import IngestionScopeRequest
 
@@ -153,28 +153,35 @@ async def pending_complaints(
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(require_admin),
 ):
-    """Fetch complaints that need moderation."""
-    from app.models.project import ComplaintStatus
+    """Fetch complaints that are still in the active admin review queue."""
     rows = (await db.execute(
-        select(Complaint)
-        .where(Complaint.status == ComplaintStatus.SUBMITTED)
+        select(Complaint, Project.title.label("project_title"))
+        .join(Project, Project.id == Complaint.project_id)
+        .where(Complaint.status.in_([
+            ComplaintStatus.SUBMITTED,
+            ComplaintStatus.UNDER_REVIEW,
+            ComplaintStatus.ESCALATED,
+        ]))
         .order_by(Complaint.created_at.desc())
         .limit(50)
-    )).scalars().all()
-    
-    # We must use Pydantic models to serialize but for simplicity we return dicts
+    )).all()
+
     return [
         {
             "id": str(c.id),
             "project_id": str(c.project_id),
+            "project_title": project_title,
             "title": c.title,
             "description": c.description,
+            "complaint_type": c.complaint_type,
             "status": c.status.value,
+            "evidence_urls": c.evidence_urls or [],
+            "submitter_name": c.submitter_name,
             "spam_score": c.spam_score,
             "is_spam": c.is_spam,
             "created_at": c.created_at,
         }
-        for c in rows
+        for c, project_title in rows
     ]
 
 
