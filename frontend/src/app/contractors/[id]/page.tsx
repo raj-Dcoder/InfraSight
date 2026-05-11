@@ -1,17 +1,19 @@
 "use client";
 
+import { use } from "react";
 import useSWR from "swr";
 import { notFound } from "next/navigation";
 import { PartyProfile } from "@/components/parties/PartyProfile";
 import { partiesApi } from "@/lib/api";
 import type { ContractorProfile } from "@/types";
 
-interface Props { params: { id: string } }
+interface Props { params: Promise<{ id: string }> }
 
 export default function ContractorProfilePage({ params }: Props) {
+  const { id } = use(params);
   const { data, error, isLoading } = useSWR<ContractorProfile>(
-    `contractor-${params.id}`,
-    () => partiesApi.contractor(params.id).then((r) => r.data)
+    `contractor-${id}`,
+    () => partiesApi.contractor(id).then((r) => r.data)
   );
 
   if (error) return notFound();

@@ -13,6 +13,7 @@ from app.core.auth import (
     create_access_token, create_refresh_token,
     require_user,
 )
+from app.core.rate_limit import limiter
 from app.models.user import User
 from app.schemas.schemas import UserRegister, UserLogin, TokenResponse, UserOut
 
@@ -20,7 +21,8 @@ router = APIRouter()
 
 
 @router.post("/register", response_model=UserOut, status_code=201)
-async def register(payload: UserRegister, db: AsyncSession = Depends(get_db)):
+@limiter.limit("5/minute")
+async def register(request: Request, payload: UserRegister, db: AsyncSession = Depends(get_db)):
     existing = (await db.execute(select(User).where(User.email == payload.email))).scalar_one_or_none()
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -38,6 +40,7 @@ async def register(payload: UserRegister, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
+@limiter.limit("10/minute")
 async def login(payload: UserLogin, request: Request, db: AsyncSession = Depends(get_db)):
     user = (await db.execute(select(User).where(User.email == payload.email))).scalar_one_or_none()
     if not user or not verify_password(payload.password, user.hashed_password):

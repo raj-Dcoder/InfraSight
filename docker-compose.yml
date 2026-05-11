@@ -52,7 +52,7 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-infrasight_user}:INFRAPWD%40rajveer321@db:5432/${POSTGRES_DB:-infrasight}
+      POSTGRES_HOST: db
       REDIS_URL: redis://redis:6379/0
     ports:
       - "8000:8000"
@@ -78,7 +78,7 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-infrasight_user}:INFRAPWD%40rajveer321@db:5432/${POSTGRES_DB:-infrasight}
+      POSTGRES_HOST: db
       REDIS_URL: redis://redis:6379/0
     depends_on:
       db:
@@ -102,7 +102,7 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-infrasight_user}:INFRAPWD%40rajveer321@db:5432/${POSTGRES_DB:-infrasight}
+      POSTGRES_HOST: db
       REDIS_URL: redis://redis:6379/0
     depends_on:
       db:
@@ -120,6 +120,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: deps
     platform: linux/amd64
     container_name: infrasight_frontend
     restart: unless-stopped
@@ -136,8 +137,8 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
+    command: sh -c "if [ ! -x node_modules/.bin/next ]; then npm ci; fi; npm run dev -- --hostname 0.0.0.0"
 
 volumes:
   postgres_data:
   redis_data:
-

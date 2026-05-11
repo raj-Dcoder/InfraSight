@@ -4,12 +4,14 @@ import asyncpg
 import os
 
 async def update_db():
-    # Credentials from .env or default
-    user = "infrasight_user"
-    password = "INFRAPWD@rajveer321"
-    database = "infrasight"
-    host = "localhost"
-    port = "5432"
+    user = os.getenv("POSTGRES_USER", "infrasight_user")
+    password = os.getenv("POSTGRES_PASSWORD")
+    database = os.getenv("POSTGRES_DB", "infrasight")
+    host = os.getenv("POSTGRES_HOST", "localhost")
+    port = os.getenv("POSTGRES_PORT", "5432")
+
+    if not password:
+        raise RuntimeError("Set POSTGRES_PASSWORD before running this migration")
 
     print(f"Connecting to database {database} on {host}...")
     try:

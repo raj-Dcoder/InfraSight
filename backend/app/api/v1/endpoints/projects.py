@@ -15,27 +15,23 @@ PATCH /projects/{id}/verify - Set verification status (verifier)
 from typing import List, Optional
 from uuid import UUID
 from datetime import date, timezone, datetime
-from pathlib import Path
-import re
-import uuid
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status, Request, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_, or_, text
+from sqlalchemy import select, func, and_, or_
 from sqlalchemy.orm import selectinload
-from geoalchemy2.functions import ST_MakeEnvelope, ST_Within, ST_AsText
 
-from app.core.config import settings
 from app.core.database import get_db
-from app.core.auth import get_current_user, require_admin, require_verifier
+from app.core.auth import require_admin, require_verifier
+from app.core.rate_limit import limiter
+from app.core.uploads import save_validated_upload
 from app.models.project import (
     Project, ProjectStatus, ProjectCategory, VerificationStatus,
-    ProjectUpdate as ProjectUpdateModel, Document, Complaint, VerificationLog
+    ProjectUpdate as ProjectUpdateModel, Document, Complaint, ComplaintStatus, VerificationLog
 )
 from app.models.user import User
 from app.schemas.schemas import (
     ProjectCreate, ProjectUpdate, ProjectOut, ProjectListItem,
-    PaginatedResponse, GeoPoint, DocumentCreate, DocumentOut
+    PaginatedResponse, DocumentCreate, DocumentOut
 )
 import structlog
 
@@ -49,37 +45,6 @@ SORT_COLUMNS = {
     "sanctioned_budget_inr": Project.sanctioned_budget_inr,
     "physical_progress_pct": Project.physical_progress_pct,
 }
-
-
-def _safe_upload_name(filename: str) -> str:
-    suffix = Path(filename).suffix.lower()
-    stem = Path(filename).stem[:80]
-    stem = re.sub(r"[^A-Za-z0-9_.-]+", "-", stem).strip("-") or "upload"
-    return f"{uuid.uuid4().hex}_{stem}{suffix}"
-
-
-async def _save_upload(file: UploadFile, folder: str) -> tuple[str, int]:
-    max_size = settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024
-    target_dir = Path(settings.UPLOAD_DIR) / folder
-    target_dir.mkdir(parents=True, exist_ok=True)
-    filename = _safe_upload_name(file.filename or "upload")
-    target = target_dir / filename
-
-    size = 0
-    with target.open("wb") as out:
-        while chunk := await file.read(1024 * 1024):
-            size += len(chunk)
-            if size > max_size:
-                target.unlink(missing_ok=True)
-                raise HTTPException(
-                    status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                    detail=f"File exceeds {settings.MAX_UPLOAD_SIZE_MB} MB limit",
-                )
-            out.write(chunk)
-
-    relative_url = f"/uploads/{folder}/{filename}".replace("\\", "/")
-    return f"{settings.PUBLIC_BASE_URL.rstrip('/')}{relative_url}", size
-
 
 def _compute_delay_days(project: Project) -> Optional[int]:
     """Return number of days delayed; None if not applicable."""
@@ -238,7 +203,9 @@ async def get_project(
 
 
 @router.post("", response_model=ProjectOut, status_code=status.HTTP_201_CREATED)
+@limiter.limit("30/minute")
 async def create_project(
+    request: Request,
     payload: ProjectCreate,
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(require_admin),
@@ -260,8 +227,10 @@ async def create_project(
 
 
 @router.patch("/{project_id}", response_model=ProjectOut)
+@limiter.limit("60/minute")
 async def update_project(
     project_id: UUID,
+    request: Request,
     payload: ProjectUpdate,
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(require_admin),
@@ -294,8 +263,10 @@ async def update_project(
 
 
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("20/minute")
 async def delete_project(
     project_id: UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(require_admin),
 ):
@@ -306,8 +277,10 @@ async def delete_project(
 
 
 @router.patch("/{project_id}/verify")
+@limiter.limit("60/minute")
 async def verify_project(
     project_id: UUID,
+    request: Request,
     verification_status: VerificationStatus,
     notes: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
@@ -360,8 +333,10 @@ async def get_project_documents(
 
 
 @router.post("/{project_id}/documents", response_model=DocumentOut, status_code=status.HTTP_201_CREATED)
+@limiter.limit("60/minute")
 async def add_project_document(
     project_id: UUID,
+    request: Request,
     payload: DocumentCreate,
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(require_admin),
@@ -384,8 +359,10 @@ async def add_project_document(
 
 
 @router.post("/{project_id}/documents/upload", response_model=DocumentOut, status_code=status.HTTP_201_CREATED)
+@limiter.limit("10/minute")
 async def upload_project_document(
     project_id: UUID,
+    request: Request,
     title: str = Form(..., min_length=3, max_length=500),
     document_type: Optional[str] = Form(None),
     file: UploadFile = File(...),
@@ -397,14 +374,14 @@ async def upload_project_document(
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
 
-    file_url, file_size = await _save_upload(file, f"documents/{project_id}")
+    file_url, file_size, mime_type = await save_validated_upload(file, f"documents/{project_id}")
     doc = Document(
         project_id=project_id,
         title=title,
         document_type=document_type,
         file_url=file_url,
         file_size_bytes=file_size,
-        mime_type=file.content_type,
+        mime_type=mime_type,
         uploaded_by=admin.id,
         is_verified=True,
     )
@@ -421,7 +398,11 @@ async def get_project_complaints(
 ):
     rows = (await db.execute(
         select(Complaint)
-        .where(Complaint.project_id == project_id, Complaint.is_spam == False)
+        .where(
+            Complaint.project_id == project_id,
+            Complaint.is_spam == False,
+            Complaint.status == ComplaintStatus.RESOLVED,
+        )
         .order_by(Complaint.upvotes.desc(), Complaint.created_at.desc())
     )).scalars().all()
     return rows

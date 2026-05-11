@@ -1,11 +1,12 @@
 """Project timeline updates endpoint."""
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.core.database import get_db
 from app.core.auth import require_admin
+from app.core.rate_limit import limiter
 from app.models.project import ProjectUpdate, Project
 from app.models.user import User
 
@@ -13,7 +14,9 @@ router = APIRouter()
 
 
 @router.post("", status_code=201)
+@limiter.limit("60/minute")
 async def post_update(
+    request: Request,
     project_id: UUID,
     title: str,
     content: str = None,

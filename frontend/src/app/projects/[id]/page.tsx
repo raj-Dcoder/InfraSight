@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import useSWR from "swr";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -23,9 +23,10 @@ import { ProjectComplaintForm } from "@/components/projects/ProjectComplaintForm
 import { ProjectDetailSkeleton } from "@/components/projects/ProjectDetailSkeleton";
 import { ProjectEvidencePanel } from "@/components/projects/ProjectEvidencePanel";
 
-interface Props { params: { id: string } }
+interface Props { params: Promise<{ id: string }> }
 
 export default function ProjectDetailPage({ params }: Props) {
+  const { id } = use(params);
   const [complaintOpen, setComplaintOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -35,20 +36,20 @@ export default function ProjectDetailPage({ params }: Props) {
   }, []);
 
   const { data: project, isLoading, error, mutate } = useSWR<ProjectDetail>(
-    `project-${params.id}`,
-    () => projectsApi.get(params.id).then((r) => r.data)
+    `project-${id}`,
+    () => projectsApi.get(id).then((r) => r.data)
   );
   const { data: complaints = [] } = useSWR<Complaint[]>(
-    project ? `complaints-${params.id}` : null,
-    () => projectsApi.complaints(params.id).then((r) => r.data)
+    project ? `complaints-${id}` : null,
+    () => projectsApi.complaints(id).then((r) => r.data)
   );
   const { data: updates = [] } = useSWR(
-    project ? `updates-${params.id}` : null,
-    () => projectsApi.updates(params.id).then((r) => r.data)
+    project ? `updates-${id}` : null,
+    () => projectsApi.updates(id).then((r) => r.data)
   );
   const { data: documents = [] } = useSWR<ProjectDocument[]>(
-    project ? `documents-${params.id}` : null,
-    () => projectsApi.documents(params.id).then((r) => r.data)
+    project ? `documents-${id}` : null,
+    () => projectsApi.documents(id).then((r) => r.data)
   );
 
   if (error) return notFound();
@@ -328,8 +329,6 @@ export default function ProjectDetailPage({ params }: Props) {
                             <a
                               key={url}
                               href={url}
-                              target="_blank"
-                              rel="noopener noreferrer"
                               className="text-blue-400 hover:text-blue-300 underline-offset-2 hover:underline"
                             >
                               Evidence {index + 1}

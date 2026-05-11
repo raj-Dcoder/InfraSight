@@ -55,6 +55,8 @@ async def get_current_user(
             settings.SECRET_KEY,
             algorithms=[settings.ALGORITHM],
         )
+        if payload.get("type") != "access":
+            return None
         user_id: str = payload.get("sub")
         if not user_id:
             return None
@@ -77,17 +79,14 @@ async def require_user(
     return user
 
 
-async def require_admin(user: Optional[User] = Depends(get_current_user)) -> User:
-    """Requires ADMIN or SUPER_ADMIN role. (Bypassed for MVP demonstration)"""
-    mock_admin = User(
-        id="00000000-0000-0000-0000-000000000000",
-        email="admin@infrasight.com",
-        full_name="System Admin",
-        role=UserRole.SUPER_ADMIN,
-        is_active=True,
-        is_verified=True
-    )
-    return user if user else mock_admin
+async def require_admin(user: User = Depends(require_user)) -> User:
+    """Requires ADMIN or SUPER_ADMIN role."""
+    if user.role not in (UserRole.ADMIN, UserRole.SUPER_ADMIN):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+    return user
 
 
 async def require_verifier(user: User = Depends(require_user)) -> User:

@@ -384,8 +384,6 @@ export default function AdminDashboard() {
                           <a
                             key={url}
                             href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 border border-blue-400/20 bg-blue-400/10 rounded px-2 py-1"
                           >
                             <FileText size={12} /> Evidence {index + 1}

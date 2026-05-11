@@ -1,56 +1,22 @@
 """
 Complaints endpoint — citizen issue submission with evidence.
 """
-import hashlib
 from typing import Optional
 from uuid import UUID
-from pathlib import Path
-import re
-import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File, Form, status
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 
-from app.core.config import settings
 from app.core.database import get_db
 from app.core.auth import get_current_user, require_admin, require_user
+from app.core.rate_limit import limiter
+from app.core.uploads import save_validated_upload
 from app.models.project import Complaint, ComplaintStatus, Project
 from app.models.user import User
 from app.schemas.schemas import ComplaintCreate, ComplaintOut
 
 router = APIRouter()
-
-
-def _safe_upload_name(filename: str) -> str:
-    suffix = Path(filename).suffix.lower()
-    stem = Path(filename).stem[:80]
-    stem = re.sub(r"[^A-Za-z0-9_.-]+", "-", stem).strip("-") or "upload"
-    return f"{uuid.uuid4().hex}_{stem}{suffix}"
-
-
-async def _save_upload(file: UploadFile, folder: str) -> str:
-    max_size = settings.MAX_UPLOAD_SIZE_MB * 1024 * 1024
-    target_dir = Path(settings.UPLOAD_DIR) / folder
-    target_dir.mkdir(parents=True, exist_ok=True)
-    filename = _safe_upload_name(file.filename or "upload")
-    target = target_dir / filename
-
-    size = 0
-    with target.open("wb") as out:
-        while chunk := await file.read(1024 * 1024):
-            size += len(chunk)
-            if size > max_size:
-                target.unlink(missing_ok=True)
-                raise HTTPException(
-                    status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                    detail=f"File exceeds {settings.MAX_UPLOAD_SIZE_MB} MB limit",
-                )
-            out.write(chunk)
-
-    relative_url = f"/uploads/{folder}/{filename}".replace("\\", "/")
-    return f"{settings.PUBLIC_BASE_URL.rstrip('/')}{relative_url}"
-
 
 def _simple_spam_score(text: str, ip: str) -> float:
     """Basic heuristic spam score (0–1). Replace with ML model in production."""
@@ -66,6 +32,7 @@ def _simple_spam_score(text: str, ip: str) -> float:
 
 
 @router.post("", response_model=ComplaintOut, status_code=201)
+@limiter.limit("10/minute")
 async def submit_complaint(
     payload: ComplaintCreate,
     request: Request,
@@ -116,8 +83,10 @@ async def get_complaint(complaint_id: UUID, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/{complaint_id}/upvote")
+@limiter.limit("30/minute")
 async def upvote_complaint(
     complaint_id: UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(require_user),
 ):
@@ -130,8 +99,10 @@ async def upvote_complaint(
 
 
 @router.post("/{complaint_id}/evidence")
+@limiter.limit("10/minute")
 async def upload_complaint_evidence(
     complaint_id: UUID,
+    request: Request,
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user),
@@ -141,7 +112,12 @@ async def upload_complaint_evidence(
     if not complaint:
         raise HTTPException(status_code=404, detail="Complaint not found")
 
-    file_url = await _save_upload(file, f"complaints/{complaint_id}")
+    if current_user is None and complaint.submitted_by is not None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Authentication required")
+    if current_user is not None and complaint.submitted_by not in (None, current_user.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cannot attach evidence to this complaint")
+
+    file_url, _, _ = await save_validated_upload(file, f"complaints/{complaint_id}")
     complaint.evidence_urls = [*(complaint.evidence_urls or []), file_url]
     return {"status": "ok", "file_url": file_url}
 

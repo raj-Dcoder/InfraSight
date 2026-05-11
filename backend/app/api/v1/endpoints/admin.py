@@ -1,17 +1,25 @@
 """
 Admin endpoints — data management, pipeline triggers, stats.
 """
-from fastapi import APIRouter, Depends, HTTPException
+from urllib.parse import urlparse
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
 from app.core.database import get_db
 from app.core.auth import require_admin
+from app.core.rate_limit import limiter
 from app.models.project import Project, Complaint, ProjectStatus, VerificationStatus, DataSource, DataSourceType, ComplaintStatus
 from app.models.user import User
 from app.schemas.schemas import IngestionScopeRequest
 
 router = APIRouter()
+
+ALLOWED_INGESTION_HOSTS = {
+    "tendersodisha.gov.in",
+    "pmgsy.nic.in",
+}
 
 
 def _default_source_details(source_type: DataSourceType) -> tuple[str, str]:
@@ -33,6 +41,16 @@ def _scope_config(payload: IngestionScopeRequest) -> dict:
     if payload.state and payload.source_type == DataSourceType.GOVERNMENT_PORTAL:
         data["states"] = [payload.state]
     return data
+
+
+def _validated_base_url(url: str | None) -> str | None:
+    if not url:
+        return None
+    parsed = urlparse(url)
+    hostname = (parsed.hostname or "").lower()
+    if parsed.scheme != "https" or hostname not in ALLOWED_INGESTION_HOSTS:
+        raise HTTPException(status_code=400, detail="Ingestion base URL is not allowed")
+    return url.rstrip("/")
 
 
 @router.get("/stats")
@@ -69,7 +87,9 @@ async def platform_stats(
 
 
 @router.post("/ingest/trigger")
+@limiter.limit("5/minute")
 async def trigger_ingestion(
+    request: Request,
     source_id: str = None,
     admin: User = Depends(require_admin),
 ):
@@ -83,7 +103,9 @@ async def trigger_ingestion(
 
 
 @router.post("/ingest/run-now")
+@limiter.limit("3/minute")
 async def run_ingestion_now(
+    request: Request,
     payload: IngestionScopeRequest,
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(require_admin),
@@ -95,6 +117,7 @@ async def run_ingestion_now(
     inside the API process and inserts matching projects into the database.
     """
     default_name, default_url = _default_source_details(payload.source_type)
+    base_url = _validated_base_url(payload.base_url)
     config = _scope_config(payload)
 
     if payload.source_id:
@@ -105,8 +128,8 @@ async def run_ingestion_now(
             raise HTTPException(status_code=404, detail="Data source not found")
 
         source.scraper_config = {**(source.scraper_config or {}), **config}
-        if payload.base_url:
-            source.base_url = payload.base_url
+        if base_url:
+            source.base_url = base_url
         source.is_active = True
         await db.commit()
         source_id = str(source.id)
@@ -121,13 +144,13 @@ async def run_ingestion_now(
 
         if source:
             source.scraper_config = config
-            source.base_url = payload.base_url or source.base_url or default_url
+            source.base_url = base_url or source.base_url or default_url
             source.is_active = True
         else:
             source = DataSource(
                 name=source_name,
                 source_type=payload.source_type,
-                base_url=payload.base_url or default_url,
+                base_url=base_url or default_url,
                 description="Admin-triggered scoped ingestion source",
                 scraper_config=config,
                 is_active=True,

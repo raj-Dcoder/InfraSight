@@ -1,17 +1,19 @@
 "use client";
 
+import { use } from "react";
 import useSWR from "swr";
 import { notFound } from "next/navigation";
 import { PartyProfile } from "@/components/parties/PartyProfile";
 import { partiesApi } from "@/lib/api";
 import type { AuthorityProfile } from "@/types";
 
-interface Props { params: { id: string } }
+interface Props { params: Promise<{ id: string }> }
 
 export default function AuthorityProfilePage({ params }: Props) {
+  const { id } = use(params);
   const { data, error, isLoading } = useSWR<AuthorityProfile>(
-    `authority-${params.id}`,
-    () => partiesApi.authority(params.id).then((r) => r.data)
+    `authority-${id}`,
+    () => partiesApi.authority(id).then((r) => r.data)
   );
 
   if (error) return notFound();
